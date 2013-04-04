@@ -1,0 +1,44 @@
+{% macro external_li(v) %}
+    <li><a href="{{ v.external }}">{{ v.tab_label | capitalize }}</a></li>
+{% endmacro %}
+
+{% macro static_li(v) %}
+    <li class="{{ v.label }}">{{ v.static.renderable() }}</li>
+{% endmacro %}
+
+{% macro independent_li(v) %}
+    <li class="{{ v.label }}">{{ v.independent.render }}</li>
+{% endmacro %}
+
+{% macro content_li(v) %}
+    <li><a href="#{{ v.label }}" data-toggle="tab">{{ v.tab_label | capitalize }}</a></li>
+{% endmacro %}
+
+{% macro _tabs_navigation(groups) %}
+    {% for g, v in groups.iteritems() %}
+        {{ v._li(v) | safe }}
+    {% endfor %}
+{% endmacro %}
+
+{% macro _tabs_content(groups) %}
+    {% for g, content in groups.iteritems() %}
+        {% if content.content %}
+            {{ _tab_content(content) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% macro _tab_content(content) %}
+    <div id="{{ content['label'] }}" class="tab-pane">
+        {{ content.content.render | safe }} 
+    </div>
+{% endmacro %}
+
+{% macro tabs_macro(t) %}
+    <ul id="{{ t.tabs_label }}-tabs" class="{{ t.tabs_nav_class }}">
+        {{ _tabs_navigation(t.tab_groups) }}
+    </ul>
+    <div id="{{ t.tabs_label }}-tabs-content" class="tab-content {{ t.tabs_content_class }}">
+        {{ _tabs_content(t.tab_groups)}}
+    </div>
+{% endmacro %}

@@ -1,0 +1,18 @@
+{% macro accordian_group_macro(accordian_group) %}
+    <div class="accordion" id="{{accordian_group.accordian_label}}-accordion">
+        {%  for g in accordian_group.accordian_groups %}
+            <div class="accordian-group {{ accordian_group.css_class }}">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#{{ g.of_accordian }}" href="#collapse{{ g.group_label | capitalize }}">
+                        {{ g.label | capitalize }}
+                    </a>
+                </div>
+                <div id="collapse{{ g.group_label | capitalize }}" class="accordion-body collapse {% if g.is_open  %}in{% endif %}">
+                    <div class="accordion-inner">
+                        {{ g.interior.render | safe }}   
+                    </div>
+                </div>
+            </div> 
+        {% endfor %}
+    </div>    
+{% endmacro %}

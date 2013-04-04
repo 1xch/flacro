@@ -34,10 +34,10 @@ class MacroFor(object):
 
     @property
     def renderable(self):
-        try:
-            return get_template_attribute(self.macro, self.macro_var)
-        except Exception, e:
-            print e
+        #try:
+        return get_template_attribute(self.macro, self.macro_var)
+        #except Exception, e:
+        #    print e
 
     @property
     def render(self):

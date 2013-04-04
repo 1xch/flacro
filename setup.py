@@ -1,5 +1,5 @@
 """
-Macro4
+Flask-Macro4
 -------------
 Tools for working with templates in flask/jinja2
 """
@@ -7,7 +7,7 @@ from setuptools import setup
 from flask_macro4 import __version__
 
 setup(
-    name='Macro4',
+    name='Flask-Macro4',
     version=__version__,
     url='https://github.com/thrisp/flask_macro4',
     license='BSD',

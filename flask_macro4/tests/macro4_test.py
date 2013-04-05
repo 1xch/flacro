@@ -2,9 +2,9 @@ from __future__ import with_statement
 
 import sys
 import os
-
+from collections import OrderedDict
 from flask import Flask, render_template
-from flask.ext.macro4 import *#Macro4, MacroFor
+from flask.ext.macro4 import *
 
 import unittest
 
@@ -51,10 +51,26 @@ class Macro4TestCase(unittest.TestCase):
         self.app.test_client().get('/')
 
     def test_01_tabs(self):
-        pass
+        @self.app.route('/')
+        def test_page():
+            ti = OrderedDict()
+            ti['e'] = TabItem('external', 'e', 'E', external="http://somewhere.com")
+            ti['s'] = TabItem('static', 's', 'S', static=MacroFor(macro='test.html', macro_var='test_macro_static'))
+            ti['i'] = TabItem('independent', 'i', 'I', independent=MacroFor(macro='test.html', macro_var='test_macro_with_value'))
+            ti['c'] = TabItem('content', 'c', 'C', content=MacroFor(macro='test.html', macro_var='test_macro_with_value'))
+            tg = TabGroupMacro("test_tabs", ti)
+            return render_template('test_page.html', m = tg)
+        self.app.test_client().get('/')
 
     def test_02_accordian(self):
-        pass
+        @self.app.route('/')
+        def test_page():
+            ai = []
+            for i in range(5):
+                ai.append(AccordianItem("accordian{}".format(i), i))
+            a = AccordianGroupMacro("accordian_test", ai)
+            return render_template('test_page.html', m = a)
+        self.app.test_client().get('/')
 
     def test_03_breadcrumb(self):
         pass

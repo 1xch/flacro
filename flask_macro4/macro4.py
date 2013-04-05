@@ -43,6 +43,10 @@ class MacroFor(object):
     def render(self):
         return self.renderable(self)
 
+    @property
+    def render_static(self):
+        return self.renderable()
+
     def render_with(self, content):
         return self.renderable(content)
 

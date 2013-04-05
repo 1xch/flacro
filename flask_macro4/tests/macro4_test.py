@@ -27,14 +27,14 @@ class Macro4TestCase(unittest.TestCase):
     def test_00_macrofor(self):
         @self.app.route('/')
         def test_page():
-            m = MacroFor(macro='test.html', macro_var='test_macro_static').renderable
+            m = MacroFor(macro='test.html', macro_var='test_macro_static', macro_attr={'static': True})
             return render_template('test_page.html', m = m)
         self.app.test_client().get('/')
 
     def test_00a_macrofor_value(self):
         @self.app.route('/')
         def test_page():
-            m = MacroFor(macro='test.html', macro_var='test_macro_with_value')
+            m = MacroFor(macro='test.html', macro_var='test_macro_with_value', macro_attr={'static': False})
             return render_template('test_page.html', m = m)
         self.app.test_client().get('/')
 
@@ -42,6 +42,7 @@ class Macro4TestCase(unittest.TestCase):
         class TestSubclass(MacroFor):
             def __init__(self, anything):
                 self.anything=anything
+                self.static = False
                 super(TestSubclass, self).__init__(macro='test.html', macro_var='test_macro_with_value')
         @self.app.route('/')
         def test_page():

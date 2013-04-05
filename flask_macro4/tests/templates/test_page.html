@@ -1,3 +1,9 @@
 TEST PAGE
 
-{{ m.render }}
+{% if m.static %}
+    {{ m.render_static }}
+{% elif m.with_content %}
+    {{ m.render_with(content=content) }}
+{% else %}
+    {{ m.render }}
+{% endif %}

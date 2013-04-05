@@ -34,10 +34,10 @@ class MacroFor(object):
 
     @property
     def renderable(self):
-        #try:
-        return get_template_attribute(self.macro, self.macro_var)
-        #except Exception, e:
-        #    print e
+        try:
+            return get_template_attribute(self.macro, self.macro_var)
+        except Exception, e:
+            print e
 
     @property
     def render(self):
@@ -88,11 +88,11 @@ class BreadCrumbItem(object):
 
     @property
     def default_label(self):
-        return self._label
+        return str(self._label)
 
     @property
     def label(self):
-        return getattr(self, self._label, self.default_label)
+        return getattr(self, "_label", self.default_label)
 
     def parse_route(self, route):
         if isinstance(route, dict):

@@ -1,0 +1,7 @@
+{% macro test_macro_static() %}
+    HELLO
+{% endmacro %}
+
+{% macro test_macro_with_value(v) %}
+    {{v.__dict__}}
+{% endmacro %}

@@ -15,6 +15,34 @@ class MacroForMeta(type):
 
 
 class MacroFor(object):
+    """
+    A container class for managing, holding and returning Jinja2 macros within a Flask application.
+    Maybe instanced as-is or used as a mixin for whatever your needs.
+
+    m = MacroFor(macro="macros/my_macro.html", macro_var="my_macro")
+
+    class MyMacro(MacroFor):
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+            super(MyMacro, self).__init__(macro="macros/my_macro.html",
+                                          macro_var="my_macro")
+
+    where "macros/my_macro.html" is a file in your templates directory and "my_macro" is a defined
+    macro within that file.
+
+    Takes four keyword arguments.
+
+        macro: the file location of your macro
+        macro_var: the name of the macro with the macro file
+        macro_attr: a dict of items you might want to access within you macro {'a': 'AAAAAA', 'b': 'BBBBB'}
+        macros: a dict of multiple macros within the same macro file specified above as {macro_var: macro_attr}
+                e.g. {'my_macro_1': {1: 'x', 2: 'y'},
+                      'my_macro_2': {'y': 1, 'x': 2}
+                     }
+
+
+    """
     __metaclass__ = MacroForMeta
 
     def __init__(self, **kwargs):
@@ -30,10 +58,12 @@ class MacroFor(object):
                 setattr(self, k, self.get_macro(k, macro_attr=v))
 
     def get_macro(self, macro_var, macro_attr=None):
+        """returns another MacroFor instance from the macro of this instance"""
         return MacroFor(macro=self.macro, macro_var=macro_var, macro_attr=macro_attr)
 
     @property
     def renderable(self):
+        """the macro held but not called"""
         try:
             return get_template_attribute(self.macro, self.macro_var)
         except Exception, e:
@@ -41,13 +71,16 @@ class MacroFor(object):
 
     @property
     def render(self):
+        """renders the macro passing itself as accessible within the macro"""
         return self.renderable(self)
 
     @property
     def render_static(self):
+        """renders a static macro, passing in no variable"""
         return self.renderable()
 
     def render_with(self, content):
+        """renders a macro with the content specified as a parameter(s)"""
         return self.renderable(content)
 
     def __repr__(self):

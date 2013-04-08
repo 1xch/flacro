@@ -129,7 +129,7 @@ class BreadCrumbItem(object):
 
     @property
     def label(self):
-        return getattr(self, "_label", self.default_label)
+        return getattr(self, self._label, self.default_label)
 
     def parse_route(self, route):
         if isinstance(route, dict):
@@ -157,13 +157,19 @@ class BreadCrumbMacro(MacroFor):
 
 
 class TabItem(object):
-    def __init__(self, kind_of, label, tab_label, **kwargs):
-        self._li = getattr(self, "make_li", None)(kind_of)
+    def __init__(self, label, tab_label, **kwargs):
         self.label = label
         self.tab_label = tab_label
         for k,v in kwargs.iteritems():
             if k in ('external', 'static', 'independent', 'content'):
-                setattr(self, k, v)
+                tab_item = k
+                tab_content = v
+            else:
+                tab_item = 'content'
+                tab_content = "None"
+            self._li = getattr(self, "make_li", None)(tab_item)
+            setattr(self, tab_item, tab_content)
+
 
     def make_li(self, kind_of):
         return MacroFor(macro="macros/tabs.html", macro_var="{}_li".format(kind_of)).renderable

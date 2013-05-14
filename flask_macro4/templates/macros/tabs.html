@@ -11,7 +11,9 @@
 {% endmacro %}
 
 {% macro content_li(v) %}
-    <li><a href="#{{ v.label }}" data-toggle="tab">{{ v.tab_label | capitalize }}</a></li>
+    <li>
+        <a href="#{{ v.label }}" data-toggle="tab">{{ v.tab_label | capitalize }}</a>
+    </li>
 {% endmacro %}
 
 {% macro _tabs_navigation(groups) %}

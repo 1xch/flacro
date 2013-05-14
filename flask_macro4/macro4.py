@@ -1,7 +1,7 @@
-from flask import get_template_attribute, url_for, Blueprint
-from jinja2 import Template
+from flask import current_app, url_for, Blueprint
+from werkzeug import LocalProxy
 
-blueprint = Blueprint('macro4', __name__, template_folder='pages')
+_macro_for = LocalProxy(lambda: current_app.jinja_env)
 
 class MacroForMeta(type):
     def __init__(cls, name, bases, dct):
@@ -16,8 +16,9 @@ class MacroForMeta(type):
 
 class MacroFor(object):
     """
-    A container class for managing, holding and returning Jinja2 macros within a Flask application.
-    Maybe instanced as-is or used as a mixin for whatever your needs.
+    A container class for managing, holding and returning Jinja2 macros within
+    a Flask application. May be instanced as-is or used as a mixin for whatever
+    your needs.
 
     m = MacroFor(macro="macros/my_macro.html", macro_var="my_macro")
 
@@ -28,21 +29,21 @@ class MacroFor(object):
             super(MyMacro, self).__init__(macro="macros/my_macro.html",
                                           macro_var="my_macro")
 
-    where "macros/my_macro.html" is a file in your templates directory and "my_macro" is a defined
-    macro within that file.
+    where "macros/my_macro.html" is a file in your templates directory and
+    "my_macro" is a defined macro within that file.
 
     Takes four keyword arguments.
 
         macro: the file location of your macro
         macro_var: the name of the macro with the macro file
-        macro_attr: a dict of items you might want to access within you macro {'a': 'AAAAAA', 'b': 'BBBBB'}
-        macros: a dict of multiple macros within the same macro file specified above as {macro_var: macro_attr}
+        macro_attr: a dict of items you might want to access within your macro
+                    e.g. {'a': 'AAAAAA', 'b': 'BBBBB'}
+        macros: a dict of multiple macros within the same file specified
+                above as macro in the form {macro_var: macro_attr}
                 e.g. {'my_macro_1': {1: 'x', 2: 'y'},
-                      'my_macro_2': {'y': 1, 'x': 2}
-                     }
-
-
+                      'my_macro_2': {'y': 1, 'x': 2}}
     """
+
     __metaclass__ = MacroForMeta
 
     def __init__(self, **kwargs):
@@ -59,15 +60,21 @@ class MacroFor(object):
 
     def get_macro(self, macro_var, macro_attr=None):
         """returns another MacroFor instance from the macro of this instance"""
-        return MacroFor(macro=self.macro, macro_var=macro_var, macro_attr=macro_attr)
+        return MacroFor(macro=self.macro,
+                        macro_var=macro_var,
+                        macro_attr=macro_attr)
+
+    def get_template_attribute(self, template_name, attribute):
+        return getattr(_macro_for.get_or_select_template(template_name).module,
+                       attribute)
 
     @property
     def renderable(self):
         """the macro held but not called"""
         try:
-            return get_template_attribute(self.macro, self.macro_var)
-        except Exception, e:
-            print e
+            return self.get_template_attribute(self.macro, self.macro_var)
+        except Exception as e:
+            raise
 
     @property
     def render(self):
@@ -88,7 +95,11 @@ class MacroFor(object):
 
 
 class AccordianItem(object):
-    def __init__(self, group_label, interior, is_open=True, display_label=None):
+    def __init__(self,
+                 group_label,
+                 interior,
+                 is_open=True,
+                 display_label=None):
         self.group_label = group_label
         self.interior = interior
         self.is_open = is_open
@@ -104,15 +115,19 @@ class AccordianItem(object):
 
 
 class AccordianGroupMacro(MacroFor):
-    def __init__(self, accordian_label, accordian_groups, group_class="accordian-macro"):
+    def __init__(self,
+                 accordian_label,
+                 accordian_groups,
+                 group_class="accordian-macro"):
         self.accordian_groups = accordian_groups
         self.accordian_label = accordian_label
         for g in accordian_groups:
             g.of_accordian = accordian_label
         self.accordian_groups = accordian_groups
         self.group_class = group_class
-        super(AccordianGroupMacro, self).__init__(macro="macros/accordian.html",
-                                                  macro_var="accordian_group_macro")
+        super(AccordianGroupMacro,
+              self).__init__(macro="macros/accordians.html",
+                             macro_var="accordian_group_macro")
 
 
 class BreadCrumbItem(object):
@@ -152,27 +167,33 @@ class BreadCrumbMacro(MacroFor):
         self.css_id = css_id
         self.css_class = css_class
         self.span_item = span_item
-        super(BreadCrumbMacro, self).__init__(macro="macros/breadcrumbs.html",
-                                              macro_var = "breadcrumbs_macro")
+        super(BreadCrumbMacro,
+              self).__init__(macro="macros/breadcrumbs.html",
+                             macro_var = "breadcrumbs_macro")
 
 
 class TabItem(object):
     def __init__(self, label, tab_label, **kwargs):
         self.label = label
         self.tab_label = tab_label
-        for k,v in kwargs.iteritems():
-            if k in ('external', 'static', 'independent', 'content'):
-                tab_item = k
-                tab_content = v
-            else:
-                tab_item = 'content'
-                tab_content = "None"
-            self._li = getattr(self, "make_li", None)(tab_item)
-            setattr(self, tab_item, tab_content)
+        self.set_tab(kwargs)
 
+    def set_tab(self, kwargs):
+        if kwargs:
+            for k,v in kwargs.iteritems():
+                if k in ('external', 'static', 'independent', 'content'):
+                    tab_item = k
+                    tab_content = v
+                else:
+                    tab_item = 'content'
+                    tab_content = "None"
+                setattr(self, '_li', getattr(self, "make_li", None)(tab_item))
+                setattr(self, tab_item, tab_content)
 
     def make_li(self, kind_of):
-        return MacroFor(macro="macros/tabs.html", macro_var="{}_li".format(kind_of)).renderable
+        tab_item = "{}_li".format(kind_of)
+        return MacroFor(macro="macros/tabs.html",
+                        macro_var=tab_item).renderable
 
 
 class TabGroupMacro(MacroFor):
@@ -180,12 +201,13 @@ class TabGroupMacro(MacroFor):
                        tab_groups,
                        tabs_nav_class="tabbed-nav",
                        tabs_content_class="content-for-tabs"):
-        super(TabGroupMacro, self).__init__(macro="macros/tabs.html",
-                                            macro_var="tabs_macro",
-                                            macro_attr={'tabs_label': tabs_label,
-                                                        'tab_groups': tab_groups,
-                                                        'tabs_nav_class': tabs_nav_class,
-                                                        'tabs_content_class': tabs_content_class})
+        super(TabGroupMacro,
+              self).__init__(macro="macros/tabs.html",
+                             macro_var="tabs_macro",
+                             macro_attr={'tabs_label': tabs_label,
+                                         'tab_groups': tab_groups,
+                                         'tabs_nav_class': tabs_nav_class,
+                                         'tabs_content_class': tabs_content_class})
 
 
 class Macro4(object):
@@ -200,4 +222,8 @@ class Macro4(object):
             self.app = None
 
     def init_app(self, app):
-        app.register_blueprint(blueprint)
+        app.register_blueprint(self._blueprint)
+
+    @property
+    def _blueprint(self):
+        return Blueprint('macro4', __name__, template_folder='templates')

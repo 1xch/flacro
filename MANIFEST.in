@@ -1,3 +1,3 @@
-recursive-include tests *.py
-recursive-include flask_macro4/pages *.*
-recursive-include flask_macro4/pages/macros *.*
+recursive-include tests *
+recursive-include flask_macro4/templates *.*
+recursive-include flask_macro4/templates/macros *.*

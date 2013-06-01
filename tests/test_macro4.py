@@ -19,8 +19,8 @@ class Macro4TestCase(unittest.TestCase):
     def test_macrofor(self):
         @self.app.route('/')
         def test_page():
-            m = MacroFor(macro='test_macros/test.html',
-                         macro_var='test_macro_static')
+            m = MacroFor(mwhere='test_macros/test.html',
+                         mname='test_macro_static')
             return render_template('test_static.html', m = m)
         rv = self.app.test_client().get('/')
         self.assertIsNotNone(rv)
@@ -28,8 +28,8 @@ class Macro4TestCase(unittest.TestCase):
     def test_macrofor_value(self):
         @self.app.route('/')
         def test_page():
-            m = MacroFor(macro='test_macros/test.html',
-                         macro_var='test_macro_with_value')
+            m = MacroFor(mwhere='test_macros/test.html',
+                         mname='test_macro_with_value')
             return render_template('test_value.html',
                                    m = m,
                                    anything="anything")
@@ -41,8 +41,8 @@ class Macro4TestCase(unittest.TestCase):
             def __init__(self, anything):
                 self.anything=anything
                 super(TestSubclass,
-                      self).__init__(macro='test_macros/test.html',
-                                     macro_var='test_macro_with_value')
+                      self).__init__(mwhere='test_macros/test.html',
+                                     mname='test_macro_with_value')
         @self.app.route('/')
         def test_page():
             m = TestSubclass("abc")
@@ -57,14 +57,14 @@ class Macro4TestCase(unittest.TestCase):
             ti['e'] = TabItem('e', 'E',
                               external="http://somewhere.com")
             ti['s'] = TabItem('s', 'S',
-                              static=MacroFor(macro='test_macros/test.html',
-                                              macro_var='test_macro_static'))
+                              static=MacroFor(mwhere='test_macros/test.html',
+                                              mname='test_macro_static'))
             ti['i'] = TabItem('i', 'I',
-                              independent=MacroFor(macro='test_macros/test.html',
-                                                   macro_var='test_macro_with_value'))
+                              independent=MacroFor(mwhere='test_macros/test.html',
+                                                   mname='test_macro_with_value'))
             ti['c'] = TabItem('c', 'C',
-                              content=MacroFor(macro='test_macros/test.html',
-                                               macro_var='test_macro_with_value'))
+                              content=MacroFor(mwhere='test_macros/test.html',
+                                               mname='test_macro_with_value'))
             tg = TabGroupMacro("test_tabs", ti)
             return render_template('test_render.html', m = tg)
         rv = self.app.test_client().get('/')

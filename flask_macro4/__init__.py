@@ -1,4 +1,5 @@
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 
-from macro4 import (Macro4, MacroFor, AccordianItem, AccordianGroupMacro,
+from macro4 import (Macro4, MacroFor)
+from packaged_macros import (AccordianItem, AccordianGroupMacro,
     BreadCrumbItem, BreadCrumbMacro, TabItem, TabGroupMacro)

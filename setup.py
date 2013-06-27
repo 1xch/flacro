@@ -1,7 +1,8 @@
 """
 Flask-Macro4
 -------------
-Tools for working with templates in flask/jinja2
+A tool for working with template macros in flask/jinja2 plus assorted useful
+pre-built macros
 """
 from setuptools import setup
 from flask_macro4 import __version__
@@ -20,7 +21,6 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'setuptools',
         'Flask >= 0.9',
     ],
     classifiers=[

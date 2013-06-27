@@ -2,6 +2,8 @@ from flask import current_app, Blueprint
 from werkzeug import LocalProxy
 
 _macro_for = LocalProxy(lambda: current_app.jinja_env)
+_glo = LocalProxy(lambda:  current_app.jinja_env.globals)
+
 
 class MacroForMeta(type):
     def __init__(cls, name, bases, dct):
@@ -17,8 +19,7 @@ class MacroForMeta(type):
 class MacroFor(object):
     """
     A container class for managing, holding and returning Jinja2 macros within
-    a Flask application. May be instanced as-is or used as a mixin for whatever
-    your needs.
+    a Flask application. May be instanced as-is or used as a mixin.
 
     m = MacroFor(mwhere="macros/my_macro.html", mname="my_macro")
 
@@ -52,10 +53,10 @@ class MacroFor(object):
         self._mattr = kwargs.get('mattr', None)
         self._macros = kwargs.get('macros', None)
         if self._mattr:
-            for k,v in self._mattr.iteritems():
+            for k, v in self._mattr.items():
                 setattr(self, k, v)
         if self._macros:
-            for k,v in self._macros.iteritems():
+            for k, v in self._macros.items():
                 setattr(self, k, self.get_macro(k, mattr=v))
 
     def get_macro(self, mname, mattr=None):
@@ -65,29 +66,38 @@ class MacroFor(object):
                         mattr=mattr)
 
     def get_template_attribute(self, template_name, attribute):
-        return getattr(_macro_for.get_or_select_template(template_name).module,
-                       attribute)
+        m = _macro_for.get_or_select_template(template_name,
+                                              globals=_glo).module
+        return getattr(m, attribute)
 
     @property
     def renderable(self):
-        """the macro held but not called"""
+        """
+        the macro held but not called
+        """
         try:
             return self.get_template_attribute(self.mwhere, self.mname)
         except Exception as e:
-            raise
+            raise e
 
     @property
     def render(self):
-        """renders the held macro passing itself as accessible within"""
+        """
+        renders the held macro passing itself as accessible within
+        """
         return self.renderable(self)
 
     @property
     def render_static(self):
-        """renders the held macro statically, passing in no variable"""
+        """
+        renders the held macro statically, passing in no variable
+        """
         return self.renderable()
 
     def render_with(self, content):
-        """renders the held macro with the content specified as a parameter(s)"""
+        """
+        renders the held macro with the content specified as a parameter(s)
+        """
         return self.renderable(content)
 
     def __repr__(self):

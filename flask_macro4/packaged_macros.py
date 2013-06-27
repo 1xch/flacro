@@ -1,4 +1,4 @@
-from macro4 import MacroFor
+from .macro4 import MacroFor
 from flask import url_for
 
 class AccordianItem(object):
@@ -87,7 +87,7 @@ class TabItem(object):
 
     def set_tab(self, kwargs):
         if kwargs:
-            for k,v in kwargs.iteritems():
+            for k,v in kwargs.items():
                 if k in ('external', 'static', 'independent', 'content'):
                     tab_item = k
                     tab_content = v

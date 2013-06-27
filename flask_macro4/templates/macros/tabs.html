@@ -17,13 +17,13 @@
 {% endmacro %}
 
 {% macro _tabs_navigation(groups) %}
-    {% for g, v in groups.iteritems() %}
+    {% for g, v in groups.items() %}
         {{ v._li(v) | safe }}
     {% endfor %}
 {% endmacro %}
 
 {% macro _tabs_content(groups) %}
-    {% for g, content in groups.iteritems() %}
+    {% for g, content in groups.items() %}
         {% if content.content %}
             {{ _tab_content(content) }}
         {% endif %}

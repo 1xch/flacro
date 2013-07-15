@@ -1,8 +1,13 @@
+import re
 from flask import current_app, Blueprint
 from werkzeug import LocalProxy
 
+
 _macro_for = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
+
+
+ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
 
 class MacroForMeta(type):
@@ -59,8 +64,17 @@ class MacroFor(object):
             for k, v in self._macros.items():
                 setattr(self, k, self.get_macro(k, mattr=v))
 
-    def get_macro(self, mname, mattr=None):
+    def __public__(self):
+        return [k for k in self.__dict__.keys() if not ATTR_BLACKLIST.search(k)]
+
+    @property
+    def public_vars(self):
+        return {k: getattr(self, k, None) for k in self.__public__()}
+
+    def get_macro(self, mname, mattr=None, replicate=False):
         """returns another MacroFor instance from the macro of this instance"""
+        if replicate:
+            mattr=self.public_vars
         return MacroFor(mwhere=self.mwhere,
                         mname=mname,
                         mattr=mattr)

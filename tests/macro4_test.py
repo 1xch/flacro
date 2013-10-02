@@ -6,22 +6,16 @@ from collections import OrderedDict
 from flask import Flask, render_template, current_app
 from flask.ext.macro4 import *
 
-import unittest
+from tests import Macro4Test
 
-class Macro4TestCase(unittest.TestCase):
-
-    def setUp(self):
-        app = Flask(__name__)
-        app.config['TESTING'] = True
-        Macro4(app)
-        self.app = app
+class Macro4TestCase(Macro4Test):
 
     def test_macrofor(self):
         @self.app.route('/')
         def test_page():
             m = MacroFor(mwhere='test_macros/test.html',
                          mname='test_macro_static')
-            return render_template('test_static.html', m = m)
+            return render_template('index.html', rstat=m)
         rv = self.app.test_client().get('/')
         self.assertIsNotNone(rv)
 
@@ -30,9 +24,9 @@ class Macro4TestCase(unittest.TestCase):
         def test_page():
             m = MacroFor(mwhere='test_macros/test.html',
                          mname='test_macro_with_value')
-            return render_template('test_value.html',
-                                   m = m,
-                                   anything="anything")
+            return render_template('index.html',
+                                   rcont = m,
+                                   content="anything")
         rv = self.app.test_client().get('/')
         self.assertIsNotNone(rv)
 
@@ -46,7 +40,7 @@ class Macro4TestCase(unittest.TestCase):
         @self.app.route('/')
         def test_page():
             m = TestSubclass("abc")
-            return render_template('test_render.html', m = m)
+            return render_template('index.html', m = m)
         rv = self.app.test_client().get('/')
         self.assertIsNotNone(rv)
 
@@ -66,7 +60,7 @@ class Macro4TestCase(unittest.TestCase):
                               content=MacroFor(mwhere='test_macros/test.html',
                                                mname='test_macro_with_value'))
             tg = TabGroupMacro("test_tabs", ti)
-            return render_template('test_render.html', m = tg)
+            return render_template('index.html', m = tg)
         rv = self.app.test_client().get('/')
         self.assertIsNotNone(rv)
 
@@ -77,7 +71,7 @@ class Macro4TestCase(unittest.TestCase):
             for i in range(5):
                 ai.append(AccordianItem("accordian{}".format(i), i))
             a = AccordianGroupMacro("accordian_test", ai)
-            return render_template('test_render.html', m = a)
+            return render_template('index.html', m = a)
         rv = self.app.test_client().get('/')
         self.assertIsNotNone(rv)
 
@@ -93,7 +87,7 @@ class Macro4TestCase(unittest.TestCase):
             bdi = [BreadCrumbItem('Home', 'test_page_one'),
                    BreadCrumbItem('Profile', 'test_page_two', active=True)]
             m = BreadCrumbMacro(bdi)
-            return render_template("test_render.html", m=m)
+            return render_template("index.html", m=m)
         rv = self.app.test_client().get('/')
         self.assertIsNotNone(rv)
 

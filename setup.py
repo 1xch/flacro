@@ -11,7 +11,7 @@ setup(
     name='Flask-Macro4',
     version=__version__,
     url='https://github.com/thrisp/flask_macro4',
-    license='BSD',
+    license='MIT',
     author='hurrata/thrisp',
     author_email='blueblank@gmail.com',
     description='flask/jinja2 templating tools',
@@ -32,6 +32,8 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    test_suite='test',
-    tests_require=['blinker'],
+    test_suite='nose.collector',
+    tests_require=[
+        'nose',
+        'blinker'],
 )

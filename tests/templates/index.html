@@ -1,0 +1,5 @@
+TEST PAGE
+
+{% if rstat %}{{ rstat.render_static }}{% endif %}
+{% if rcont %}{{ rcont.render_with(content=content) }}{% endif %}
+{% if m %}{{ m.render }}{% endif %}

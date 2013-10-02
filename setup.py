@@ -8,7 +8,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Macro4',
-    version='0',
+    version='0.0.6',
     url='https://github.com/thrisp/flask_macro4',
     license='MIT',
     author='hurrata/thrisp',

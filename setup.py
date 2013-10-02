@@ -5,11 +5,10 @@ A tool for working with template macros in flask/jinja2 plus assorted useful
 pre-built macros
 """
 from setuptools import setup
-from flask_macro4 import __version__
 
 setup(
     name='Flask-Macro4',
-    version=__version__,
+    version='',
     url='https://github.com/thrisp/flask_macro4',
     license='MIT',
     author='hurrata/thrisp',

@@ -16,6 +16,8 @@ import re
 from datetime import datetime, date
 from subprocess import Popen, PIPE
 
+PROJECT_NAME = u'flask_macro4'
+
 _date_clean_re = re.compile(r'(\d+)(st|nd|rd|th)')
 
 
@@ -91,7 +93,7 @@ def set_filename_version(filename, version_number, pattern):
 
 def set_init_version(version):
     info('Setting __init__.py version to %s', version)
-    set_filename_version('flask_anyform/__init__.py', version, '__version__')
+    set_filename_version('{}/__init__.py'.format(project_name), version, '__version__')
 
 
 def set_setup_version(version):

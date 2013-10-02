@@ -16,7 +16,7 @@ import re
 from datetime import datetime, date
 from subprocess import Popen, PIPE
 
-PROJECT_NAME = u'flask_macro4'
+project_name = u'flask_macro4'
 
 _date_clean_re = re.compile(r'(\d+)(st|nd|rd|th)')
 

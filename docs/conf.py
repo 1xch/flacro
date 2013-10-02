@@ -15,7 +15,7 @@ import sys, os
 
 project_name = u'Flask-Macro4'
 project_org = u'Thrisp/Hurrata'
-proejct_publisher = project_org
+project_publisher = project_org
 project_copyright = u'2013, {}'.format(project_org)
 
 # If extensions (or modules to document with autodoc) are in another directory,

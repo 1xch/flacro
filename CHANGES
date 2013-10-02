@@ -1,0 +1,15 @@
+Flask-Macro4 Changelog
+=======================
+
+Here you can see the full list of changes between each Flask-Macro4 release.
+
+Version 0.0.6
+-------------
+
+Released October 2nd 2013
+
+- documentation format
+- new testing format including nose & tox.ini
+- proper changelog
+- dev & master version clarified
+- started with adding templates for angular-bootstrap

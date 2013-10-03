@@ -3,7 +3,7 @@ from flask import current_app, Blueprint
 from werkzeug import LocalProxy
 
 
-_macro_for = LocalProxy(lambda: current_app.jinja_env)
+_macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
 
 
@@ -68,21 +68,24 @@ class MacroFor(object):
         return [k for k in self.__dict__.keys() if not ATTR_BLACKLIST.search(k)]
 
     @property
-    def public_vars(self):
+    def public(self):
         return {k: getattr(self, k, None) for k in self.__public__()}
 
     def get_macro(self, mname, mattr=None, replicate=False):
-        """returns another MacroFor instance from the macro of this instance"""
+        """returns another MacroFor instance with a differently named macro from
+        the template location of this instance
+        """
         if replicate:
             mattr=self.public_vars
         return MacroFor(mwhere=self.mwhere,
                         mname=mname,
                         mattr=mattr)
 
-    def get_template_attribute(self, template_name, attribute):
-        m = _macro_for.get_or_select_template(template_name,
-                                              globals=_glo).module
-        return getattr(m, attribute)
+    def jinja_template(self, template_where):
+        return _macro4_jinja.get_or_select_template(template_where, globals=_glo).module
+
+    def get_template_attribute(self, template_where, macro_name):
+        return getattr(self.jinja_template(template_where), macro_name)
 
     @property
     def renderable(self):
@@ -96,26 +99,20 @@ class MacroFor(object):
 
     @property
     def render(self):
-        """
-        renders the held macro passing itself as accessible within
-        """
+        """ calls the macro, passing itself as accessible within """
         return self.renderable(self)
 
     @property
     def render_static(self):
-        """
-        renders the held macro statically, passing in no variable
-        """
+        """ calls the macro passing in no variable """
         return self.renderable()
 
     def render_with(self, content):
-        """
-        renders the held macro with the content specified as a parameter(s)
-        """
+        """calls the macro with the content specified as a parameter(s)"""
         return self.renderable(content)
 
     def __repr__(self):
-        return "<{}: {}>".format(self.mwhere, self.mname)
+        return "<MacroFor {}: {}>".format(self.mwhere, self.mname)
 
 
 class Macro4(object):

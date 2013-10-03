@@ -32,9 +32,8 @@ class AccordianGroupMacro(MacroFor):
             g.of_accordian = accordian_label
         self.accordian_groups = accordian_groups
         self.group_class = group_class
-        super(AccordianGroupMacro,
-              self).__init__(mwhere="macros/accordians.html",
-                             mname="accordian_group_macro")
+        super(AccordianGroupMacro, self).__init__(mwhere="macros/accordians.html",
+                                                  mname="accordian_group_macro")
 
 
 class BreadCrumbItem(object):
@@ -74,9 +73,8 @@ class BreadCrumbMacro(MacroFor):
         self.css_id = css_id
         self.css_class = css_class
         self.span_item = span_item
-        super(BreadCrumbMacro,
-              self).__init__(mwhere="macros/breadcrumbs.html",
-                             mname = "breadcrumbs_macro")
+        super(BreadCrumbMacro, self).__init__(mwhere="macros/breadcrumbs.html",
+                                              mname = "breadcrumbs_macro")
 
 
 class TabItem(object):
@@ -104,14 +102,14 @@ class TabItem(object):
 
 
 class TabGroupMacro(MacroFor):
-    def __init__(self, tabs_label,
-                       tab_groups,
-                       tabs_nav_class="tabbed-nav",
-                       tabs_content_class="content-for-tabs"):
-        super(TabGroupMacro,
-              self).__init__(mwhere="macros/tabs.html",
-                             mname="tabs_macro",
-                             mattr={'tabs_label': tabs_label,
-                                    'tab_groups': tab_groups,
-                                    'tabs_nav_class': tabs_nav_class,
-                                    'tabs_content_class': tabs_content_class})
+    def __init__(self,
+                 tabs_label,
+                 tab_groups,
+                 tabs_nav_class="tabbed-nav",
+                 tabs_content_class="content-for-tabs"):
+        super(TabGroupMacro, self).__init__(mwhere="macros/tabs.html",
+                                            mname="tabs_macro",
+                                            mattr={'tabs_label': tabs_label,
+                                                   'tab_groups': tab_groups,
+                                                   'tabs_nav_class': tabs_nav_class,
+                                                   'tabs_content_class': tabs_content_class})

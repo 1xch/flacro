@@ -1,7 +1,22 @@
 {% macro test_macro_static() %}
-    HELLO
+    STATIC MACRO
 {% endmacro %}
 
-{% macro test_macro_with_value(v) %}
-    {{v.__dict__}}
+{% macro test_macro_with_content(c) %}
+    {{c['any']}}
+{% endmacro %}
+
+{% macro test_macro_with_attr(v) %}
+    {{v.anything}}
+{% endmacro %}
+
+{% macro test_macro_general(v) %}
+{% endmacro %}
+
+{% macro test_macro_independent(v) %}
+    {{v.iam}}
+{% endmacro %}
+
+{% macro test_macro_tab_content(v) %}
+    {{v.iam}}
 {% endmacro %}

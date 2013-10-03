@@ -1,11 +1,11 @@
 import re
 from flask import current_app, Blueprint
 from werkzeug import LocalProxy
-
+from .compat import with_metaclass
 
 _macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
-
+_macro4 = LocalProxy(lambda: MacroFor.registry)
 
 ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
@@ -21,10 +21,10 @@ class MacroForMeta(type):
         super(MacroForMeta, cls).__init__(name, bases, dct)
 
 
-class MacroFor(object):
+class MacroFor(with_metaclass(MacroForMeta)):
     """
     A container class for managing, holding and returning Jinja2 macros within
-    a Flask application. May be instanced as-is or used as a mixin.
+    a Flask application. Instance as-is or use as a mixin.
 
     m = MacroFor(mwhere="macros/my_macro.html", mname="my_macro")
 
@@ -40,18 +40,15 @@ class MacroFor(object):
 
     Takes four keyword arguments.
 
-        :param mwhere: the file location of your macro
-        :param mname:  the name of the macro with the macro file
-        :param mattr:  a dict of items you might want to access within your
-                       macro e.g. {'a': 'AAAAAA', 'b': 'BBBBB'}
+        :param mwhere: the jinja template file location of your macro
+        :param mname:  the name of the macro within the macro file
+        :param mattr:  a dict of items you might want to access
+                       e.g. {'a': 'AAAAAA', 'b': 'BBBBB'}
         :param macros: a dict of macros within the same file specified
                        above as mwhere in the form {mname: mattr}
                        e.g. {'my_macro_1': {1: 'x', 2: 'y'},
-                             'my_macro_2': {'y': 1, 'x': 2}}
+                             'my_macro_2': None}
     """
-
-    __metaclass__ = MacroForMeta
-
     def __init__(self, **kwargs):
         self.mwhere = kwargs.get('mwhere', None)
         self.mname = kwargs.get('mname', None)
@@ -71,6 +68,9 @@ class MacroFor(object):
     def public(self):
         return {k: getattr(self, k, None) for k in self.__public__()}
 
+    def update(self, **kwargs):
+        [setattr(self, k, v) for k,v in kwargs.items()]
+
     def get_macro(self, mname, mattr=None, replicate=False):
         """returns another MacroFor instance with a differently named macro from
         the template location of this instance
@@ -89,26 +89,24 @@ class MacroFor(object):
 
     @property
     def renderable(self):
-        """
-        the macro held but not called
-        """
+        """the macro held but not called"""
         try:
             return self.get_template_attribute(self.mwhere, self.mname)
-        except Exception as e:
-            raise e
+        except RuntimeError:
+            return LocalProxy(lambda: self.get_template_attribute(self.mwhere, self.mname))
 
     @property
     def render(self):
-        """ calls the macro, passing itself as accessible within """
+        """calls the macro, passing itself as accessible within"""
         return self.renderable(self)
 
     @property
     def render_static(self):
-        """ calls the macro passing in no variable """
+        """calls the macro passing in no variable"""
         return self.renderable()
 
     def render_with(self, content):
-        """calls the macro with the content specified as a parameter(s)"""
+        """calls the macro with the content specified as parameter(s)"""
         return self.renderable(content)
 
     def __repr__(self):
@@ -117,17 +115,22 @@ class MacroFor(object):
 
 class Macro4(object):
     """
-    flask/jinja2 tools for managing template macros programmtically
+    flask/jinja2 tools for managing template macros
     """
-    def __init__(self, app=None):
-        if app is not None:
-            self.app = app
+    def __init__(self,
+                 app=None,
+                 register_blueprint=True):
+        self.app = app
+        self.register_blueprint = register_blueprint
+        self.macros = _macro4
+
+        if self.app is not None:
             self.init_app(self.app)
-        else:
-            self.app = None
 
     def init_app(self, app):
-        app.register_blueprint(self._blueprint)
+        app.extensions['macro4'] = self
+        if self.register_blueprint:
+            app.register_blueprint(self._blueprint)
 
     @property
     def _blueprint(self):

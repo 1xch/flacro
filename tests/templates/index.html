@@ -1,5 +1,5 @@
-TEST PAGE
-
+<h1>TEST PAGE</h1>
 {% if rstat %}{{ rstat.render_static }}{% endif %}
-{% if rcont %}{{ rcont.render_with(content=content) }}{% endif %}
+{% if rcont %}{{ rcont.render_with(content) }}{% endif %}
+{% if rattr %}{{ rattr.render }}{% endif %}
 {% if m %}{{ m.render }}{% endif %}

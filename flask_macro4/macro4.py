@@ -3,8 +3,7 @@ from flask import current_app, Blueprint
 from werkzeug import LocalProxy
 from .compat import with_metaclass
 from collections import defaultdict
-#import weakref
-import pprint
+
 
 _macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
@@ -14,19 +13,13 @@ ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
 
 class MacroForMeta(type):
-    def __new__(cls, name, bases, dct):
-        new_class = super(MacroForMeta, cls).__new__(cls, name, bases, dct)
-        if not hasattr(cls, '_instances'):
-            new_class._instances = defaultdict(set) #defaultdict(weakref.WeakSet)
-        return new_class
-
     def __init__(cls, name, bases, dct):
-        if not hasattr(cls, 'registry'):
-            cls.registry = {}
+        if not hasattr(cls, '_instances'):
+            cls._instances = defaultdict(set)
+        if not hasattr(cls, '_registry'):
+            cls._registry = {}
         else:
-            interface_id = name.lower()
-            cls.registry[interface_id] = cls._instances
-
+            cls._registry[name.lower()] = cls._instances
         super(MacroForMeta, cls).__init__(name, bases, dct)
 
 
@@ -150,11 +143,10 @@ class Macro4(object):
             app.register_blueprint(self._blueprint)
 
     def make_ctx_prc(self, app):
-        for mf in MacroFor.registry.values():
+        for mf in MacroFor._registry.values():
             for m, macro in mf.items():
                 if m:
                     app.jinja_env.globals.update(self.get_ctx_prc(macro))
-        #pprint.pprint(app.jinja_env.globals)
 
     def get_ctx_prc(self, macro):
         def ctx_prc(macro):

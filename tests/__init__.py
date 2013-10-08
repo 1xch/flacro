@@ -9,26 +9,29 @@ class Macro4Test(TestCase):
         app.config['TESTING'] = True
         Macro4(app)
         self.app = app
-        static_macro = MacroFor(mwhere='test_macros/test.html', mname='test_macro_static')
-        content_macro = MacroFor(mwhere='test_macros/test.html',mname='test_macro_with_content')
+        static_macro = MacroFor(tag='static_macro', mwhere='test_macros/test.html', mname='test_macro_static')
+        content_macro = MacroFor(tag='content_macro', mwhere='test_macros/test.html',mname='test_macro_with_content')
+        named_macro = MacroFor(tag='named_macro', mwhere='test_macros/test.html',mname='test_named_macro')
 
         class TestSubclass(MacroFor):
-            def __init__(self, anything):
+            def __init__(self, anything, **kwargs):
                 self.anything=anything
-                super(TestSubclass, self).__init__(mwhere='test_macros/test.html',
+                super(TestSubclass, self).__init__(tag=kwargs.get('tag', None),
+                                                   mwhere='test_macros/test.html',
                                                    mname='test_macro_with_attr')
 
-        attr_macro  = TestSubclass("abc")
+        attr_macro  = TestSubclass("abc", tag="ATTR_MACRO_1")
+        attr_macro_alternate  = TestSubclass("123", tag="ATTR_MACRO_2")
 
         #accordian macro
         ai = []
         for i in range(5):
-            ai.append(AccordianItem("accordian{}".format(i), MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'})))
-        accordian_macro = AccordianGroupMacro("accordian_test", ai)
+            ai.append(AccordianItem("accordian{}".format(i), MacroFor(tag="inner_{}".format(i), mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'})))
+        accordian_macro = AccordianGroupMacro("tag_for_accordian_macro", "accordian_test", ai)
 
         #breadcrumb macro
         bdi = [BreadCrumbItem('Home', 'test_page_one'), BreadCrumbItem('Profile', 'test_page_two', active=True)]
-        breadcrumbs_macro = BreadCrumbMacro(bdi)
+        breadcrumbs_macro = BreadCrumbMacro("tag_for_breadcrumb_macro", bdi, css_class='test_breadcrumb')
 
         #tab group macro
         ti = OrderedDict()
@@ -36,7 +39,9 @@ class Macro4Test(TestCase):
         ti['s'] = TabItem('s', 'S', static=MacroFor(mwhere='test_macros/test.html', mname='test_macro_static'))
         ti['i'] = TabItem('i', 'I', independent=MacroFor(mwhere='test_macros/test.html', mname='test_macro_independent', mattr={'iam': 'independent'}))
         ti['c'] = TabItem('c', 'C', content=MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'}))
-        tabs_macro = TabGroupMacro("test_tabs", ti)
+        tabs_macro = TabGroupMacro(tag="tag_for_tab_macro",
+                                   tabs_label="test_tabs",
+                                   tab_groups=ti)
 
         packaged_macros = {'accordian_macro': accordian_macro,
                            'breadcrumbs_macro': breadcrumbs_macro,
@@ -53,6 +58,10 @@ class Macro4Test(TestCase):
         @self.app.route('/attr_macro')
         def sub_mac():
             return render_template('index.html', rattr=attr_macro)
+
+        @self.app.route('/named_macro')
+        def nam_mac():
+            return render_template('index.html', test_named=True)
 
         @self.app.route('/<macro_type>')
         def gen_mac(macro_type):

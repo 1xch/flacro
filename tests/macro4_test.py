@@ -20,24 +20,27 @@ class Macro4TestCase(Macro4Test):
         rv = self.app.test_client().get('/attr_macro')
         self.assertIn(b'abc', rv.data)
 
+    def test_macrofor_named(self):
+        rv = self.app.test_client().get('/named_macro')
+        self.assertIn(b'A NAMED MACRO RENDERED BY NAME', rv.data)
+        self.assertIn(b'123', rv.data)
 
 class PackagedMacrosTestCase(Macro4Test):
-    def test_tabs(self):
-        rv = self.app.test_client().get('/tabs_macro')
-        self.assertIn(b'<li><a href="http://somewhere.com">E</a></li>', rv.data)
-        self.assertIn(b'STATIC MACRO', rv.data)
-        self.assertIn(b'independent', rv.data)
-        self.assertIn(b'<a href="#c" data-toggle="tab">C</a>', rv.data)
-        self.assertIn(b'content', rv.data)
-
     def test_accordian(self):
         rv = self.app.test_client().get('/accordian_macro')
-        self.assertIn(b'<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordian_test" href="#collapseAccordian3">', rv.data)
-        self.assertIn(b'<div id="collapseAccordian3" class="accordion-body collapse in">', rv.data)
+        self.assertIn(b'accordian_test-accordion', rv.data)
+        self.assertIn(b'#accordian_test', rv.data)
 
     def test_breadcrumb(self):
         rv = self.app.test_client().get('/breadcrumbs_macro')
-        self.assertIn(b'<li class="active"><a href="/two">Profile</a></li>', rv.data)
+        self.assertIn(b'Home', rv.data)
+        self.assertIn(b'Profile', rv.data)
+        self.assertIn(b'test_breadcrumb', rv.data)
+
+    def test_tabs(self):
+        rv = self.app.test_client().get('/tabs_macro')
+        self.assertIn(b'test_tabs-tabs', rv.data)
+        self.assertIn(b'test_tabs-tabs-content', rv.data)
 
 if __name__ == '__main__':
     unittest.main()

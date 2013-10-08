@@ -3,3 +3,7 @@
 {% if rcont %}{{ rcont.render_with(content) }}{% endif %}
 {% if rattr %}{{ rattr.render }}{% endif %}
 {% if m %}{{ m.render }}{% endif %}
+{% if test_named %}
+    {{named_macro}}
+    {{ATTR_MACRO_2}}
+{% endif %}

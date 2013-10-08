@@ -2,21 +2,30 @@ import re
 from flask import current_app, Blueprint
 from werkzeug import LocalProxy
 from .compat import with_metaclass
+from collections import defaultdict
+#import weakref
+import pprint
 
 _macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
-_macro4 = LocalProxy(lambda: MacroFor.registry)
+
 
 ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
 
 class MacroForMeta(type):
+    def __new__(cls, name, bases, dct):
+        new_class = super(MacroForMeta, cls).__new__(cls, name, bases, dct)
+        if not hasattr(cls, '_instances'):
+            new_class._instances = defaultdict(set) #defaultdict(weakref.WeakSet)
+        return new_class
+
     def __init__(cls, name, bases, dct):
         if not hasattr(cls, 'registry'):
             cls.registry = {}
         else:
             interface_id = name.lower()
-            cls.registry[interface_id] = cls
+            cls.registry[interface_id] = cls._instances
 
         super(MacroForMeta, cls).__init__(name, bases, dct)
 
@@ -50,6 +59,7 @@ class MacroFor(with_metaclass(MacroForMeta)):
                              'my_macro_2': None}
     """
     def __init__(self, **kwargs):
+        self.tag = kwargs.get('tag', None)
         self.mwhere = kwargs.get('mwhere', None)
         self.mname = kwargs.get('mname', None)
         self._mattr = kwargs.get('mattr', None)
@@ -60,6 +70,13 @@ class MacroFor(with_metaclass(MacroForMeta)):
         if self._macros:
             for k, v in self._macros.items():
                 setattr(self, k, self.get_macro(k, mattr=v))
+        self.register_instance()
+
+    def register_instance(self):
+        if getattr(self, 'tag', None):
+            self._instances[self.tag] = self
+        else:
+            self._instances[None].add(self)
 
     def __public__(self):
         return [k for k in self.__dict__.keys() if not ATTR_BLACKLIST.search(k)]
@@ -76,7 +93,7 @@ class MacroFor(with_metaclass(MacroForMeta)):
         the template location of this instance
         """
         if replicate:
-            mattr=self.public_vars
+            mattr=self.public
         return MacroFor(mwhere=self.mwhere,
                         mname=mname,
                         mattr=mattr)
@@ -110,7 +127,7 @@ class MacroFor(with_metaclass(MacroForMeta)):
         return self.renderable(content)
 
     def __repr__(self):
-        return "<MacroFor {}: {}>".format(self.mwhere, self.mname)
+        return "<MacroFor {} ({}: {})>".format(getattr(self, 'tag', None), self.mwhere, self.mname)
 
 
 class Macro4(object):
@@ -122,15 +139,27 @@ class Macro4(object):
                  register_blueprint=True):
         self.app = app
         self.register_blueprint = register_blueprint
-        self.macros = _macro4
 
         if self.app is not None:
             self.init_app(self.app)
 
     def init_app(self, app):
         app.extensions['macro4'] = self
+        self.make_ctx_prc(app)
         if self.register_blueprint:
             app.register_blueprint(self._blueprint)
+
+    def make_ctx_prc(self, app):
+        for mf in MacroFor.registry.values():
+            for m, macro in mf.items():
+                if m:
+                    app.jinja_env.globals.update(self.get_ctx_prc(macro))
+        #pprint.pprint(app.jinja_env.globals)
+
+    def get_ctx_prc(self, macro):
+        def ctx_prc(macro):
+            return LocalProxy(lambda: getattr(macro, 'render', None))
+        return {macro.tag: ctx_prc(macro)}
 
     @property
     def _blueprint(self):

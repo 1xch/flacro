@@ -7,7 +7,7 @@ from collections import defaultdict
 
 _macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
-
+_macros = LocalProxy(lambda: MacroFor._instances)
 
 ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
@@ -63,13 +63,14 @@ class MacroFor(with_metaclass(MacroForMeta)):
         if self._macros:
             for k, v in self._macros.items():
                 setattr(self, k, self.get_macro(k, mattr=v))
-        self.register_instance()
+        self.register_instance(self)
 
-    def register_instance(self):
-        if getattr(self, 'tag', None):
-            self._instances[self.tag] = self
+    @classmethod
+    def register_instance(cls, instance):
+        if getattr(instance, 'tag', None):
+            cls._instances[instance.tag] = instance
         else:
-            self._instances[None].add(self)
+            cls._instances[None].add(instance)
 
     def __public__(self):
         return [k for k in self.__dict__.keys() if not ATTR_BLACKLIST.search(k)]
@@ -132,6 +133,7 @@ class Macro4(object):
                  register_blueprint=True):
         self.app = app
         self.register_blueprint = register_blueprint
+        self.macros = _macros
 
         if self.app is not None:
             self.init_app(self.app)

@@ -74,3 +74,6 @@ class Macro4Test(TestCase):
         @self.app.route('/two')
         def test_page_two():
             return "TWO"
+
+    def tearDown(self):
+        self.app = None

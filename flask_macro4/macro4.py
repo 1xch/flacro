@@ -4,18 +4,20 @@ from werkzeug import LocalProxy
 from .compat import with_metaclass
 from collections import defaultdict
 
-
 _macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
-_macros = LocalProxy(lambda: MacroFor._instances)
 
 ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
 
 class MacroForMeta(type):
-    def __init__(cls, name, bases, dct):
+    def __new__(cls, name, bases, dct):
+        new_class = super(MacroForMeta, cls).__new__(cls, name, bases, dct)
         if not hasattr(cls, '_instances'):
-            cls._instances = defaultdict(set)
+            new_class._instances = defaultdict(set)
+        return new_class
+
+    def __init__(cls, name, bases, dct):
         if not hasattr(cls, '_registry'):
             cls._registry = {}
         else:
@@ -72,12 +74,12 @@ class MacroFor(with_metaclass(MacroForMeta)):
         else:
             cls._instances[None].add(instance)
 
-    def __public__(self):
+    def _public(self):
         return [k for k in self.__dict__.keys() if not ATTR_BLACKLIST.search(k)]
 
     @property
     def public(self):
-        return {k: getattr(self, k, None) for k in self.__public__()}
+        return {k: getattr(self, k, None) for k in self._public()}
 
     def update(self, **kwargs):
         [setattr(self, k, v) for k,v in kwargs.items()]
@@ -133,7 +135,7 @@ class Macro4(object):
                  register_blueprint=True):
         self.app = app
         self.register_blueprint = register_blueprint
-        self.macros = _macros
+        self.macros = MacroFor._registry
 
         if self.app is not None:
             self.init_app(self.app)
@@ -145,7 +147,7 @@ class Macro4(object):
             app.register_blueprint(self._blueprint)
 
     def make_ctx_prc(self, app):
-        for mf in MacroFor._registry.values():
+        for mf in self.macros.values():
             for m, macro in mf.items():
                 if m:
                     app.jinja_env.globals.update(self.get_ctx_prc(macro))

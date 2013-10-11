@@ -1,11 +1,13 @@
 import re
-from flask import current_app, Blueprint
+from flask import current_app, Blueprint, _app_ctx_stack
 from werkzeug import LocalProxy
 from .compat import with_metaclass
 from collections import defaultdict
+import weakref
 
 _macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
+
 
 ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
@@ -66,6 +68,8 @@ class MacroFor(with_metaclass(MacroForMeta)):
             for k, v in self._macros.items():
                 setattr(self, k, self.get_macro(k, mattr=v))
         self.register_instance(self)
+        if self.tag:
+            self.register_ctx_prc()
 
     @classmethod
     def register_instance(cls, instance):
@@ -73,6 +77,15 @@ class MacroFor(with_metaclass(MacroForMeta)):
             cls._instances[instance.tag] = instance
         else:
             cls._instances[None].add(instance)
+
+    def register_ctx_prc(self):
+        return current_app.jinja_env.globals.update(self.ctx_prc)
+
+    @property
+    def ctx_prc(self):
+        def ctx_prc(macro):
+            return LocalProxy(lambda: getattr(macro, 'render', None))
+        return {self.tag: ctx_prc(self)}
 
     def _public(self):
         return [k for k in self.__dict__.keys() if not ATTR_BLACKLIST.search(k)]
@@ -86,8 +99,7 @@ class MacroFor(with_metaclass(MacroForMeta)):
 
     def get_macro(self, mname, mattr=None, replicate=False):
         """returns another MacroFor instance with a differently named macro from
-        the template location of this instance
-        """
+        the template location of this instance"""
         if replicate:
             mattr=self.public
         return MacroFor(mwhere=self.mwhere,
@@ -142,20 +154,16 @@ class Macro4(object):
 
     def init_app(self, app):
         app.extensions['macro4'] = self
-        self.make_ctx_prc(app)
+        #self.make_ctx_prc(app)
         if self.register_blueprint:
             app.register_blueprint(self._blueprint)
 
-    def make_ctx_prc(self, app):
-        for mf in self.macros.values():
-            for m, macro in mf.items():
-                if m:
-                    app.jinja_env.globals.update(self.get_ctx_prc(macro))
+    #def make_ctx_prc(self, app):
+    #    for mf in self.macros.values():
+    #        for m, macro in mf.items():
+    #           if m:
+    #               #register ctx_prc
 
-    def get_ctx_prc(self, macro):
-        def ctx_prc(macro):
-            return LocalProxy(lambda: getattr(macro, 'render', None))
-        return {macro.tag: ctx_prc(macro)}
 
     @property
     def _blueprint(self):

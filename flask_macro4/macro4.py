@@ -68,8 +68,6 @@ class MacroFor(with_metaclass(MacroForMeta)):
             for k, v in self._macros.items():
                 setattr(self, k, self.get_macro(k, mattr=v))
         self.register_instance(self)
-        if self.tag:
-            self.register_ctx_prc()
 
     @classmethod
     def register_instance(cls, instance):
@@ -77,9 +75,6 @@ class MacroFor(with_metaclass(MacroForMeta)):
             cls._instances[instance.tag] = instance
         else:
             cls._instances[None].add(instance)
-
-    def register_ctx_prc(self):
-        return current_app.jinja_env.globals.update(self.ctx_prc)
 
     @property
     def ctx_prc(self):
@@ -154,16 +149,15 @@ class Macro4(object):
 
     def init_app(self, app):
         app.extensions['macro4'] = self
-        #self.make_ctx_prc(app)
+        app.before_request(self.make_ctx_prc)
         if self.register_blueprint:
             app.register_blueprint(self._blueprint)
 
-    #def make_ctx_prc(self, app):
-    #    for mf in self.macros.values():
-    #        for m, macro in mf.items():
-    #           if m:
-    #               #register ctx_prc
-
+    def make_ctx_prc(self):
+        for mf in self.macros.values():
+            for m, macro in mf.items():
+                if m:
+                    self.app.jinja_env.globals.update(macro.ctx_prc)
 
     @property
     def _blueprint(self):

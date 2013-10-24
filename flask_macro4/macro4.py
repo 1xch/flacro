@@ -161,9 +161,9 @@ class Macro4(object):
             app.register_blueprint(self._blueprint)
 
     def make_ctx_prc(self):
-        ((self.app.jinja_env.globals.update(macro.ctx_prc)
-            for m, macro in mf.items() if m)
-            for mf in self._registry.values())
+        [[self.app.jinja_env.globals.update(macro.ctx_prc)
+            for m, macro in mf.items() if m]
+            for mf in self._registry.values()]
 
     @property
     def _blueprint(self):

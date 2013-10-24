@@ -1,13 +1,12 @@
 import re
 from flask import current_app, Blueprint, _app_ctx_stack
-from werkzeug import LocalProxy
+from werkzeug import LocalProxy, MultiDict, CombinedMultiDict
 from .compat import with_metaclass
 from collections import defaultdict
 import weakref
 
 _macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
-
 
 ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
@@ -16,14 +15,17 @@ class MacroForMeta(type):
     def __new__(cls, name, bases, dct):
         new_class = super(MacroForMeta, cls).__new__(cls, name, bases, dct)
         if not hasattr(cls, '_instances'):
-            new_class._instances = defaultdict(set)
+            new_class._instances = defaultdict(weakref.WeakSet)
+        if not hasattr(cls, '_manager'):
+            cls._manager = {}
+        cls._manager[new_class.__name__] = new_class
         return new_class
 
     def __init__(cls, name, bases, dct):
         if not hasattr(cls, '_registry'):
             cls._registry = {}
         else:
-            cls._registry[name.lower()] = cls._instances
+            cls._registry[name] = cls._instances
         super(MacroForMeta, cls).__init__(name, bases, dct)
 
 
@@ -101,11 +103,11 @@ class MacroFor(with_metaclass(MacroForMeta)):
                         mname=mname,
                         mattr=mattr)
 
-    def jinja_template(self, template_where):
-        return _macro4_jinja.get_or_select_template(template_where, globals=_glo).module
+    def jinja_template(self, mwhere):
+        return _macro4_jinja.get_template(mwhere, globals=_glo).module
 
-    def get_template_attribute(self, template_where, macro_name):
-        return getattr(self.jinja_template(template_where), macro_name)
+    def get_template_attribute(self, mwhere, mname):
+        return getattr(self.jinja_template(mwhere), mname)
 
     @property
     def renderable(self):
@@ -142,10 +144,15 @@ class Macro4(object):
                  register_blueprint=True):
         self.app = app
         self.register_blueprint = register_blueprint
-        self.macros = MacroFor._registry
-
+        self._registry = MacroFor._registry
+        self._managed = MacroFor._manager
         if self.app is not None:
             self.init_app(self.app)
+
+    @property
+    def provides(self):
+        return CombinedMultiDict([(MultiDict([(k,v),(k, self._registry.get(k, None))]))
+            for k,v in self._managed.items()])
 
     def init_app(self, app):
         app.extensions['macro4'] = self
@@ -154,10 +161,9 @@ class Macro4(object):
             app.register_blueprint(self._blueprint)
 
     def make_ctx_prc(self):
-        for mf in self.macros.values():
-            for m, macro in mf.items():
-                if m:
-                    self.app.jinja_env.globals.update(macro.ctx_prc)
+        ((self.app.jinja_env.globals.update(macro.ctx_prc)
+            for m, macro in mf.items() if m)
+            for mf in self._registry.values())
 
     @property
     def _blueprint(self):

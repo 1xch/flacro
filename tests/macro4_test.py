@@ -26,6 +26,9 @@ class Macro4TestCase(Macro4Test):
         self.assertIn(b'A NAMED MACRO RENDERED BY NAME', rv.data)
         self.assertIn(b'123', rv.data)
 
+    #def test_macro_print(self):
+    #    import pprint
+    #    pprint.pprint(MacroFor._r)
 
 class PackagedMacrosTestCase(Macro4Test):
     def test_accordian(self):

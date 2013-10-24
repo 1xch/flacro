@@ -74,7 +74,7 @@ class MacroFor(with_metaclass(MacroForMeta)):
     @classmethod
     def register_instance(cls, instance):
         if getattr(instance, 'tag', None):
-            cls._instances[instance.tag] = instance
+            cls._instances[instance.tag] = weakref.ref(instance, instance) #viable or stupid
         else:
             cls._instances[None].add(instance)
 
@@ -161,7 +161,7 @@ class Macro4(object):
             app.register_blueprint(self._blueprint)
 
     def make_ctx_prc(self):
-        [[self.app.jinja_env.globals.update(macro.ctx_prc)
+        [[self.app.jinja_env.globals.update(macro().ctx_prc)
             for m, macro in mf.items() if m]
             for mf in self._registry.values()]
 

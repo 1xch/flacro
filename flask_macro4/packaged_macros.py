@@ -89,27 +89,38 @@ class TabItem(object):
     def set_tab(self, kwargs):
         if kwargs:
             for k,v in kwargs.items():
-                if k in ('external', 'static', 'independent', 'content'):
-                    tab_item = k
+                if k in ('minimal', 'external', 'static', 'independent', 'content'):
+                    tab_type = k
                     tab_content = v
                 else:
-                    tab_item = 'content'
+                    tab_type = 'content'
                     tab_content = "None"
-                setattr(self, '_li', getattr(self, "make_li", None)(tab_item))
-                setattr(self, tab_item, tab_content)
+                setattr(self, '_li', getattr(self, "make_li", None)(tab_type))
+                setattr(self, tab_type, tab_content)
 
-    def make_li(self, kind_of):
-        tab_item = "{}_li".format(kind_of)
+    def make_li(self, tab_type):
+        tab = "{}_li".format(tab_type)
         return MacroFor(mwhere="macros/tabs.html",
-                        mname=tab_item).renderable
+                        mname=tab).renderable
 
 
 class TabGroupMacro(MacroFor):
     def __init__(self, **kwargs):
-        super(TabGroupMacro, self).__init__(tag=kwargs.get('tag', None),
-                                            mwhere="macros/tabs.html",
-                                            mname="tabs_macro",
-                                            mattr={'tabs_label': kwargs.get('tabs_label', None),
-                                                   'tab_groups': kwargs.get('tab_groups', None),
-                                                   'tabs_nav_class': kwargs.get('tabs_nav_class',"tabbed-nav"),
-                                                   'tabs_content_class': kwargs.get('tabs_content_class', "content-for-tabs")})
+        self.tag = kwargs.get('tag', None)
+        self.minimal = kwargs.get('minimal', False)
+        if self.minimal:
+            self.mname = "minimal_tabs"
+        else:
+            self.mname = "tabs_macro"
+        self.mwhere = kwargs.get('mwhere', "macros/tabs.html")
+        self.tabs_label = kwargs.get('tabs_label', None)
+        self.tab_groups = kwargs.get('tab_groups', None)
+        self.tabs_nav_class = kwargs.get('tabs_nav_class',"tabbed-nav")
+        self.tabs_content_class = kwargs.get('tabs_content_class', "content-for-tabs")
+        super(TabGroupMacro, self).__init__(tag=self.tag,
+                                            mname=self.mname,
+                                            mwhere=self.mwhere,
+                                            mattr={'tabs_label': self.tabs_label,
+                                                   'tab_groups': self.tab_groups,
+                                                   'tabs_nav_class': self.tabs_nav_class,
+                                                   'tabs_content_class': self.tabs_content_class})

@@ -44,3 +44,16 @@
         {{ _tabs_content(t.tab_groups)}}
     </div>
 {% endmacro %}
+
+
+{% macro minimal_tabs(t) %}
+    <tabset>
+        {% for k,v in t.tab_groups.items() %}
+            {% if k in ('minimal', 'external', 'independent', 'static') %}
+                {{v._li.render | safe }}
+            {% else %}
+                <tab heading={{v['label']}}>{{ v.content.render | safe}}</tab>
+            {% endif %}
+        {% endfor %}
+    </tabset>
+{% endmacro %}

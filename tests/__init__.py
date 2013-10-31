@@ -39,7 +39,8 @@ class Macro4Test(TestCase):
         ti['s'] = TabItem('s', 'S', static=MacroFor(mwhere='test_macros/test.html', mname='test_macro_static'))
         ti['i'] = TabItem('i', 'I', independent=MacroFor(mwhere='test_macros/test.html', mname='test_macro_independent', mattr={'iam': 'independent'}))
         ti['c'] = TabItem('c', 'C', content=MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'}))
-        tabs_macro = TabGroupMacro(tag="tag_for_tab_macro",
+        tabs_macro = TabGroupMacro(minimal=False,
+                                   tag="tag_for_tab_macro",
                                    tabs_label="test_tabs",
                                    tab_groups=ti)
 

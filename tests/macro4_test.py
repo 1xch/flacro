@@ -43,6 +43,16 @@ class PackagedMacrosTestCase(Macro4Test):
         rv = self.app.test_client().get('/tabs_macro')
         self.assertIn(b'test_tabs-tabs', rv.data)
         self.assertIn(b'test_tabs-tabs-content', rv.data)
+        rv = self.app.test_client().get('minimal_tabs_macro')
+        self.assertIn(b'tabset', rv.data)
+        self.assertIn(b'minimal', rv.data)
+
+    def test_links_list(self):
+        rv = self.app.test_client().get('/links_list')
+        self.assertIn(b'l1', rv.data)
+        self.assertIn(b'href="/one"', rv.data)
+        self.assertIn(b'arbitrary=for_attr_macro_route', rv.data)
+
 
 if __name__ == '__main__':
     unittest.main()

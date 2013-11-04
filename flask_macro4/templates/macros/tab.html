@@ -1,3 +1,7 @@
+{% macro minimal_li(v) %}
+    {{ v.minimal.render }}
+{% endmacro %}
+
 {% macro external_li(v) %}
     <li><a href="{{ v.external }}">{{ v.tab_label | capitalize }}</a></li>
 {% endmacro %}
@@ -11,9 +15,7 @@
 {% endmacro %}
 
 {% macro content_li(v) %}
-    <li>
-        <a href="#{{ v.label }}" data-toggle="tab">{{ v.tab_label | capitalize }}</a>
-    </li>
+    <li><a href="#{{ v.label }}" data-toggle="tab">{{ v.tab_label | capitalize }}</a></li>
 {% endmacro %}
 
 {% macro _tabs_navigation(groups) %}
@@ -36,7 +38,7 @@
     </div>
 {% endmacro %}
 
-{% macro tabs_macro(t) %}
+{% macro bootstrap_tabs(t) %}
     <ul id="{{ t.tabs_label }}-tabs" class="{{ t.tabs_nav_class }}">
         {{ _tabs_navigation(t.tab_groups) }}
     </ul>
@@ -49,10 +51,10 @@
 {% macro minimal_tabs(t) %}
     <tabset>
         {% for k,v in t.tab_groups.items() %}
-            {% if k in ('minimal', 'external', 'independent', 'static') %}
-                {{v._li.render | safe }}
+            {% if v.kind in ('minimal', 'external', 'static', 'independent') %}
+                {{ v._li(v) | safe}}
             {% else %}
-                <tab heading={{v['label']}}>{{ v.content.render | safe}}</tab>
+                <tab heading={{v['label']}}>{{ v.content.render | safe }}</tab>
             {% endif %}
         {% endfor %}
     </tabset>

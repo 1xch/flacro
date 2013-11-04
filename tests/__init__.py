@@ -35,18 +35,28 @@ class Macro4Test(TestCase):
 
         #tab group macro
         ti = OrderedDict()
-        ti['e'] = TabItem('e', 'E', external="http://somewhere.com")
-        ti['s'] = TabItem('s', 'S', static=MacroFor(mwhere='test_macros/test.html', mname='test_macro_static'))
-        ti['i'] = TabItem('i', 'I', independent=MacroFor(mwhere='test_macros/test.html', mname='test_macro_independent', mattr={'iam': 'independent'}))
-        ti['c'] = TabItem('c', 'C', content=MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'}))
+        tie = TabItem('e', 'E', external="http://somewhere.com")
+        tis = TabItem('s', 'S', static=MacroFor(mwhere='test_macros/test.html', mname='test_macro_static'))
+        tii = TabItem('i', 'I', independent=MacroFor(mwhere='test_macros/test.html', mname='test_macro_independent', mattr={'iam': 'independent'}))
+        tic = TabItem('c', 'C', content=MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'}))
+        tim = TabItem('m', 'M', minimal=MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'minimal'}))
+        tabitems = [tie, tis, tii, tic]
+        [ti.update({k.label: k}) for k in tabitems]
+        ti2 = ti
+        ti2['m'] = tim
         tabs_macro = TabGroupMacro(minimal=False,
                                    tag="tag_for_tab_macro",
                                    tabs_label="test_tabs",
                                    tab_groups=ti)
+        minimal_tabs_macro = TabGroupMacro(minimal=True,
+                                          tag="tag_for_minimal_tabs",
+                                          tabs_label="minimal_test_tabs",
+                                          tab_groups=ti2)
 
         packaged_macros = {'accordian_macro': accordian_macro,
                            'breadcrumbs_macro': breadcrumbs_macro,
-                           'tabs_macro': tabs_macro}
+                           'tabs_macro': tabs_macro,
+                           'minimal_tabs_macro': minimal_tabs_macro}
 
         @self.app.route('/static_macro')
         def stat_mac():
@@ -75,6 +85,15 @@ class Macro4Test(TestCase):
         @self.app.route('/two')
         def test_page_two():
             return "TWO"
+
+        #ul/li links macro
+        l1 = LiItem('l1', for_url='test_page_one')
+        l2 = LiItem('l2', for_url='test_page_two', arbitrary='for_attr_macro_route')
+
+        links_list = UlMacro([l1, l2])
+
+        packaged_macros.update({'links_list': links_list})
+
 
     def tearDown(self):
         self.app = None

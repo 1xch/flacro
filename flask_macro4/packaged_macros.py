@@ -14,7 +14,7 @@ class UlMacro(MacroFor):
         self.list_items = list_items
         self.css_class = kwargs.get('css_class', None)
         self.css_id = kwargs.get('css_id', None)
-        super(UlMacro, self).__init__(mname='ullinks',
+        super(UlMacro, self).__init__(mname='listmacro',
                                       mwhere="macros/list.html")
 
 
@@ -34,7 +34,7 @@ class LiItem(MacroFor):
         self.route = for_url
         self.route_add = kwargs
         self.url = partial(self.generate_url)
-        super(LiItem, self).__init__(mname="lilink",
+        super(LiItem, self).__init__(mname="listitem",
                                      mwhere="macros/list.html")
 
     def generate_url(self):
@@ -141,7 +141,7 @@ class TabItem(object):
 
     def make_li(self, tab_type):
         tab = "{}_li".format(tab_type)
-        return MacroFor(mwhere="macros/tabs.html",
+        return MacroFor(mwhere="macros/tab.html",
                         mname=tab).renderable
 
 

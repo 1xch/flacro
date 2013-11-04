@@ -1,15 +1,15 @@
-{% macro ullinks(ullinks) %}
-    <ul{%if ullinks.css_id%}id="{{ullinks.css_id}}"{%endif%}{%if ullinks.css_class%} class="{{ullinks.css_class}}"{%endif%}>
-        {% for item in ullinks.list_items %}
+{% macro listmacro(listitems) %}
+    <ul{%if listitems.css_id%}id="{{listitems.css_id}}"{%endif%}{%if listitems.css_class%} class="{{listitems.css_class}}"{%endif%}>
+        {% for item in listitems.list_items %}
             {{item.render | safe}}
         {% endfor %}
     </ul>
 {% endmacro %}
 
-{% macro lilink(link) %}
-    {% if link.independent %}
-        {{ link.render | safe }}
+{% macro listitem(item) %}
+    {% if item.independent %}
+        {{ item.render | safe }}
     {% else %}
-        <li{%if link.css_class%}class="{{link.css_class}}"{%endif%}><a href="{{link.url()}}">{{link.name}}</a></li>
+        <li{%if item.css_class%}class="{{item.css_class}}"{%endif%}><a href="{{item.url()}}">{{item.name}}</a></li>
     {% endif %}
 {% endmacro %}

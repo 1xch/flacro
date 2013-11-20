@@ -28,16 +28,17 @@ class Macro4TestCase(Macro4Test):
 
 
 class PackagedMacrosTestCase(Macro4Test):
+    def test_list(self):
+        rv = self.app.test_client().get('/links_list')
+        self.assertIn(b'l1', rv.data)
+        self.assertIn(b'href="/one"', rv.data)
+        self.assertIn(b'arbitrary=for_attr_macro_route', rv.data)
+        self.assertIn(b'a plain item', rv.data)
+
     def test_accordian(self):
         rv = self.app.test_client().get('/accordian_macro')
         self.assertIn(b'accordian_test-accordion', rv.data)
         self.assertIn(b'#accordian_test', rv.data)
-
-    def test_breadcrumb(self):
-        rv = self.app.test_client().get('/breadcrumbs_macro')
-        self.assertIn(b'Home', rv.data)
-        self.assertIn(b'Profile', rv.data)
-        self.assertIn(b'test_breadcrumb', rv.data)
 
     def test_tabs(self):
         rv = self.app.test_client().get('/tabs_macro')
@@ -47,11 +48,6 @@ class PackagedMacrosTestCase(Macro4Test):
         self.assertIn(b'tabset', rv.data)
         self.assertIn(b'minimal', rv.data)
 
-    def test_links_list(self):
-        rv = self.app.test_client().get('/links_list')
-        self.assertIn(b'l1', rv.data)
-        self.assertIn(b'href="/one"', rv.data)
-        self.assertIn(b'arbitrary=for_attr_macro_route', rv.data)
 
 
 if __name__ == '__main__':

@@ -29,10 +29,6 @@ class Macro4Test(TestCase):
             ai.append(AccordianItem("accordian{}".format(i), MacroFor(tag="inner_{}".format(i), mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'})))
         accordian_macro = AccordianGroupMacro("tag_for_accordian_macro", "accordian_test", ai)
 
-        #breadcrumb macro
-        bdi = [BreadCrumbItem('Home', 'test_page_one'), BreadCrumbItem('Profile', 'test_page_two', active=True)]
-        breadcrumbs_macro = BreadCrumbMacro("tag_for_breadcrumb_macro", bdi, css_class='test_breadcrumb')
-
         #tab group macro
         ti = OrderedDict()
         tie = TabItem('e', 'E', external="http://somewhere.com")
@@ -54,7 +50,6 @@ class Macro4Test(TestCase):
                                           tab_groups=ti2)
 
         packaged_macros = {'accordian_macro': accordian_macro,
-                           'breadcrumbs_macro': breadcrumbs_macro,
                            'tabs_macro': tabs_macro,
                            'minimal_tabs_macro': minimal_tabs_macro}
 
@@ -87,10 +82,11 @@ class Macro4Test(TestCase):
             return "TWO"
 
         #list/listitems macro
-        l1 = LiItem('l1', for_url='test_page_one')
-        l2 = LiItem('l2', for_url='test_page_two', arbitrary='for_attr_macro_route')
+        l1 = LiItem('l1', kind='link', for_url='test_page_one')
+        l2 = LiItem('l2', kind='link', for_url='test_page_two', arbitrary='for_attr_macro_route')
+        l3 = LiItem('a plain item')
 
-        links_list = ListMacro([l1, l2])
+        links_list = ListMacro([l1, l2, l3])
 
         packaged_macros.update({'links_list': links_list})
 

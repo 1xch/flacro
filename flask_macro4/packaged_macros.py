@@ -4,43 +4,52 @@ from flask import url_for
 
 
 class ListMacro(MacroFor):
-    """A generalized list (of links or independent macros)
+    """A generalized list (links, macros, or anything)
 
-    :param kin:        type of list ul or ol
-    :param list_items: a list of LiItems items
-    :param css_class:  list class
-    :param css_id:     list id
+    :param list_tag:    a tag for the lsit
+    :param kind:        type of list ul or ol
+    :param list_items:  a list of LiItems items
+    :param css_class:   a css class
+    :param css_id:      a css id
     """
     def __init__(self, list_items, **kwargs):
+        self.list_tag = kwargs.get('list_tag', None)
         self.kind = kwargs.get('kind', 'ul')
         self.list_items = list_items
         self.css_class = kwargs.get('css_class', None)
         self.css_id = kwargs.get('css_id', None)
-        super(ListMacro, self).__init__(mname='listmacro',
-                                      mwhere="macros/list.html")
+        super(ListMacro, self).__init__(mname='listmacro', mwhere="macros/list.html")
 
 
 class LiItem(MacroFor):
     """A list item containing a link. Any kwargs left over will be passed to
     url creation
 
-    :param name:         visible string printed as the link
-    :param for_url:      the flask route passed to url_for
-    :param css_class:    the li css class, default
-    :param independent:  set True if item is another Macro, defaults to False
+    :param li_tag:       a tag for item
+    :param kind:         type of li item: plain(tag only), link, macro
+    :param li:           is an actual html li, defaults True, set False to eliminate <li></li>
+    :param css_class:    a css class
+    :param for_url:      the flask route passed to url_for or a url
+    :param external:     for_url is external
     """
-    def __init__(self, name, for_url=None, **kwargs):
-        self.name = name
+    def __init__(self, li_tag, **kwargs):
+        self.li_tag = li_tag
+        self.kind = kwargs.pop('kind', 'plain')
+        self.li = kwargs.pop('li', True)
         self.css_class = kwargs.pop('css_class', None)
-        self.independent = kwargs.pop('independent', False)
-        self.route = for_url
-        self.route_add = kwargs
-        self.url = partial(self.generate_url)
-        super(LiItem, self).__init__(mname="listitem",
-                                     mwhere="macros/list.html")
+        self._route = kwargs.pop('for_url', None)
+        self._route_external = kwargs.pop('external', False)
+        self._route_add = kwargs
+        if self._route:
+            self.url = partial(self.generate_url, self._route, self._route_add, external=self._route_external)
+        super(LiItem, self).__init__(mname="{}item".format(self.kind), mwhere="macros/list.html")
 
-    def generate_url(self):
-        return url_for(self.route, **self.route_add)
+    @staticmethod
+    def generate_url(route, route_add, external=False):
+        if external:
+            return route
+        else:
+            return url_for(route, **route_add)
 
 
 class AccordianItem(object):
@@ -78,47 +87,6 @@ class AccordianGroupMacro(MacroFor):
         super(AccordianGroupMacro, self).__init__(tag=tag,
                                                   mwhere="macros/accordian.html",
                                                   mname="accordian_group_macro")
-
-
-class BreadCrumbItem(object):
-    def __init__(self, requested_label, route, active=False):
-        self._label = requested_label
-        self.route = None
-        self.route_params = None
-        self.active = active
-        self.parse_route(route)
-
-    @property
-    def default_label(self):
-        return str(self._label)
-
-    @property
-    def label(self):
-        return getattr(self, self._label, self.default_label)
-
-    def parse_route(self, route):
-        if isinstance(route, dict):
-            self.route = route.pop('base')
-            self.route_params = route
-        else:
-            self.route = route
-
-    @property
-    def generate_url(self):
-        if self.route_params:
-            return url_for(self.route, **self.route_params)
-        else:
-            return url_for(self.route)
-
-
-class BreadCrumbMacro(MacroFor):
-    def __init__(self, tag, items, css_id=None, css_class=None):
-        self.items = items
-        self.css_id = css_id
-        self.css_class = css_class
-        super(BreadCrumbMacro, self).__init__(tag=tag,
-                                              mwhere="macros/breadcrumb.html",
-                                              mname = "breadcrumbs_macro")
 
 
 class TabItem(object):

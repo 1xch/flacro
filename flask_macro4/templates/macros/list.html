@@ -1,15 +1,23 @@
 {% macro listmacro(l) %}
-    <{{l.kind}} {%if l.css_id%}id='{{l.css_id}}'{%endif%}{%if l.css_class%} class='{{l.css_class}}'{%endif%}>
+    <{{l.kind}}{%if l.css_id%} id='{{l.css_id}}'{%endif%}{%if l.css_class%} class='{{l.css_class}}'{%endif%}>
         {% for item in l.list_items %}
-            {{item.render | safe}}
+            {{item.render|safe}}
         {% endfor %}
     </{{l.kind}}>
 {% endmacro %}
 
-{% macro listitem(li) %}
-    {% if li.independent %}
-        {{ li.render | safe }}
-    {% else %}
-        <li{%if li.css_class%}class="{{li.css_class}}"{%endif%}><a href="{{li.url()}}">{{li.name}}</a></li>
-    {% endif %}
+{% macro _li_enclosure(item) %}
+    {%if item.li%}<li{%if item.css_class%} class="{{item.css_class}}"{%endif%}>{%endif%}{{ caller() }}{%if item.li%}</li>{%endif%}
+{% endmacro %}
+
+{% macro plainitem(li) %}
+    {% call _li_enclosure(li) %}{{li.li_tag}}{% endcall %}
+{% endmacro %}
+
+{% macro linkitem(li) %}
+    {% call _li_enclosure(li) %}<a href="{{li.url()}}">{{li.li_tag}}</a>{% endcall %}
+{% endmacro %}
+
+{% macro macroitem(li) %}
+    {{li.li_tag.render|safe}}
 {% endmacro %}

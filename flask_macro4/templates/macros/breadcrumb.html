@@ -1,7 +1,7 @@
 {% macro breadcrumbs_macro(b) %}
     <ul {% if b.css_id %}id="{{ b.css_id }}"{% endif %} class="{% if b.css_class %}{{ b.css_class }}{% endif %} breadcrumb">
         {% for i in b.items %}
-            <li {% if i.active %}class="active"{% endif %}><a href="{{ i.generate_url }}">{{ i.label | safe }}</a>{% if not loop.last %} <span class="divider">{{ b.span_item }}</span>{% endif %}</li>
+            <li {% if i.active %}class="active"{% endif %}><a href="{{ i.generate_url }}">{{ i.label | safe }}</a></li>
         {% endfor %}
     </ul>
 {% endmacro %}

@@ -1,5 +1,5 @@
 {% macro listmacro(listitems) %}
-    <ul{%if listitems.css_id%}id="{{listitems.css_id}}"{%endif%}{%if listitems.css_class%} class="{{listitems.css_class}}"{%endif%}>
+    <ul {%if listitems.css_id%}id='{{listitems.css_id}}'{%endif%}{%if listitems.css_class%} class='{{listitems.css_class}}'{%endif%}>
         {% for item in listitems.list_items %}
             {{item.render | safe}}
         {% endfor %}

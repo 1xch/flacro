@@ -110,11 +110,10 @@ class BreadCrumbItem(object):
 
 
 class BreadCrumbMacro(MacroFor):
-    def __init__(self, tag, items, css_id=None, css_class=None, span_item="/"):
+    def __init__(self, tag, items, css_id=None, css_class=None):
         self.items = items
         self.css_id = css_id
         self.css_class = css_class
-        self.span_item = span_item
         super(BreadCrumbMacro, self).__init__(tag=tag,
                                               mwhere="macros/breadcrumb.html",
                                               mname = "breadcrumbs_macro")

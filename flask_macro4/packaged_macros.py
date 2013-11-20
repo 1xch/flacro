@@ -3,24 +3,6 @@ from .macro4 import MacroFor
 from flask import url_for
 
 
-class ListMacro(MacroFor):
-    """A generalized list (links, macros, or anything)
-
-    :param list_tag:    a tag for the lsit
-    :param kind:        type of list ul or ol
-    :param list_items:  a list of LiItems items
-    :param css_class:   a css class
-    :param css_id:      a css id
-    """
-    def __init__(self, list_items, **kwargs):
-        self.list_tag = kwargs.get('list_tag', None)
-        self.kind = kwargs.get('kind', 'ul')
-        self.list_items = list_items
-        self.css_class = kwargs.get('css_class', None)
-        self.css_id = kwargs.get('css_id', None)
-        super(ListMacro, self).__init__(mname='listmacro', mwhere="macros/list.html")
-
-
 class LiItem(MacroFor):
     """A list item containing a link. Any kwargs left over will be passed to
     url creation
@@ -50,6 +32,24 @@ class LiItem(MacroFor):
             return route
         else:
             return url_for(route, **route_add)
+
+
+class ListMacro(MacroFor):
+    """A generalized list (links, macros, or anything)
+
+    :param list_tag:    a tag for the lsit
+    :param kind:        type of list ul or ol
+    :param list_items:  a list of LiItems items
+    :param css_class:   a css class
+    :param css_id:      a css id
+    """
+    def __init__(self, list_items, **kwargs):
+        self.list_tag = kwargs.get('list_tag', None)
+        self.kind = kwargs.get('kind', 'ul')
+        self.list_items = list_items
+        self.css_class = kwargs.get('css_class', None)
+        self.css_id = kwargs.get('css_id', None)
+        super(ListMacro, self).__init__(mname='listmacro', mwhere="macros/list.html")
 
 
 class AccordianItem(object):

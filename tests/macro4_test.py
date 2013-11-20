@@ -49,6 +49,5 @@ class PackagedMacrosTestCase(Macro4Test):
         self.assertIn(b'minimal', rv.data)
 
 
-
 if __name__ == '__main__':
     unittest.main()

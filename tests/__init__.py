@@ -86,11 +86,11 @@ class Macro4Test(TestCase):
         def test_page_two():
             return "TWO"
 
-        #ul/li links macro
+        #list/listitems macro
         l1 = LiItem('l1', for_url='test_page_one')
         l2 = LiItem('l2', for_url='test_page_two', arbitrary='for_attr_macro_route')
 
-        links_list = UlMacro([l1, l2])
+        links_list = ListMacro([l1, l2])
 
         packaged_macros.update({'links_list': links_list})
 

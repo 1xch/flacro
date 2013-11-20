@@ -3,18 +3,20 @@ from .macro4 import MacroFor
 from flask import url_for
 
 
-class UlMacro(MacroFor):
+class ListMacro(MacroFor):
     """A generalized list (of links or independent macros)
 
+    :param kin:        type of list ul or ol
     :param list_items: a list of LiItems items
-    :param css_class:  ul class
-    :param css_id:     ul id
+    :param css_class:  list class
+    :param css_id:     list id
     """
     def __init__(self, list_items, **kwargs):
+        self.kind = kwargs.get('kind', 'ul')
         self.list_items = list_items
         self.css_class = kwargs.get('css_class', None)
         self.css_id = kwargs.get('css_id', None)
-        super(UlMacro, self).__init__(mname='listmacro',
+        super(ListMacro, self).__init__(mname='listmacro',
                                       mwhere="macros/list.html")
 
 

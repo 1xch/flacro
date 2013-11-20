@@ -1,15 +1,15 @@
-{% macro listmacro(listitems) %}
-    <ul {%if listitems.css_id%}id='{{listitems.css_id}}'{%endif%}{%if listitems.css_class%} class='{{listitems.css_class}}'{%endif%}>
-        {% for item in listitems.list_items %}
+{% macro listmacro(l) %}
+    <{{l.kind}} {%if l.css_id%}id='{{l.css_id}}'{%endif%}{%if l.css_class%} class='{{l.css_class}}'{%endif%}>
+        {% for item in l.list_items %}
             {{item.render | safe}}
         {% endfor %}
-    </ul>
+    </{{l.kind}}>
 {% endmacro %}
 
-{% macro listitem(item) %}
-    {% if item.independent %}
-        {{ item.render | safe }}
+{% macro listitem(li) %}
+    {% if li.independent %}
+        {{ li.render | safe }}
     {% else %}
-        <li{%if item.css_class%}class="{{item.css_class}}"{%endif%}><a href="{{item.url()}}">{{item.name}}</a></li>
+        <li{%if li.css_class%}class="{{li.css_class}}"{%endif%}><a href="{{li.url()}}">{{li.name}}</a></li>
     {% endif %}
 {% endmacro %}

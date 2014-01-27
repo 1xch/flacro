@@ -6,7 +6,7 @@ Here you can see the full list of changes between each Flask-Macro4 release.
 Version 0.0.7
 -------------
 
-Released November ??? 2013
+Released January 27th 2014
 
 - cleanup & refactor
 - added extension to current_app.extensions

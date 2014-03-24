@@ -125,12 +125,19 @@ class TabGroupMacro(MacroFor):
         self.mwhere = kwargs.get('mwhere', "macros/tab.html")
         self.tabs_label = kwargs.get('tabs_label', None)
         self.tab_groups = kwargs.get('tab_groups', None)
-        self.tabs_nav_class = kwargs.get('tabs_nav_class',"tabbed-nav")
-        self.tabs_content_class = kwargs.get('tabs_content_class', "content-for-tabs")
+        self.tabset_css_class = kwargs.get('tabset_css_class', "tabset-macro")
+        self.vertical = kwargs.get('vertical', False)
+        self.justified = kwargs.get('justified', False)
+        self.pills =  kwargs.get('pills', False)
         super(TabGroupMacro, self).__init__(tag=self.tag,
                                             mname=self.mname,
                                             mwhere=self.mwhere,
                                             mattr={'tabs_label': self.tabs_label,
                                                    'tab_groups': self.tab_groups,
-                                                   'tabs_nav_class': self.tabs_nav_class,
-                                                   'tabs_content_class': self.tabs_content_class})
+                                                   'tabs_css_class': self.tabset_css_class,
+                                                   'tabs_nav_class': "tabbed-nav-{}".format(self.tabset_css_class),
+                                                   'tabs_content_class': "content-for-tabs-{}".format(self.tabset_css_class),
+                                                   'vertical': self.vertical,
+                                                   'justified': self.justified,
+                                                   'pills': self.pills,
+                                                   })

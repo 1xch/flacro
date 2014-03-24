@@ -45,9 +45,9 @@ class Macro4Test(TestCase):
                                    tabs_label="test_tabs",
                                    tab_groups=ti)
         minimal_tabs_macro = TabGroupMacro(minimal=True,
-                                          tag="tag_for_minimal_tabs",
-                                          tabs_label="minimal_test_tabs",
-                                          tab_groups=ti2)
+                                           tag="tag_for_minimal_tabs",
+                                           tabs_label="minimal_test_tabs",
+                                           tab_groups=ti2)
 
         packaged_macros = {'accordian_macro': accordian_macro,
                            'tabs_macro': tabs_macro,

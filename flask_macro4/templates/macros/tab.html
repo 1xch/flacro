@@ -39,17 +39,18 @@
 {% endmacro %}
 
 {% macro bootstrap_tabs(t) %}
-    <ul id="{{ t.tabs_label }}-tabs" class="{{ t.tabs_nav_class }}">
-        {{ _tabs_navigation(t.tab_groups) }}
-    </ul>
-    <div id="{{ t.tabs_label }}-tabs-content" class="tab-content {{ t.tabs_content_class }}">
-        {{ _tabs_content(t.tab_groups)}}
+    <div class={{ t.tabset_css_class }}>
+        <ul class="nav {% if t.pills %} nav-pills{% else %} nav-tabs{% endif %}{% if t.justified %} nav-justified{% endif %}{% if t.vertical %} nav-stacked{% endif %}">
+            {{ _tabs_navigation(t.tab_groups) }}
+        </ul>
+        <div class="tab-content">
+            {{ _tabs_content(t.tab_groups)}}
+        </div>
     </div>
 {% endmacro %}
 
-
 {% macro minimal_tabs(t) %}
-    <tabset>
+    <tabset class={{ t.tabset_css_class }}{%if t.vertical%} vertical="true"{% endif %}{% if t.justified %} justified="true"{% endif %}>
         {% for k,v in t.tab_groups.items() %}
             {% if v.kind in ('minimal', 'external', 'static', 'independent') %}
                 {{ v._li(v) | safe}}

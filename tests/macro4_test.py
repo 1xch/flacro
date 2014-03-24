@@ -42,8 +42,8 @@ class PackagedMacrosTestCase(Macro4Test):
 
     def test_tabs(self):
         rv = self.app.test_client().get('/tabs_macro')
-        self.assertIn(b'test_tabs-tabs', rv.data)
-        self.assertIn(b'test_tabs-tabs-content', rv.data)
+        self.assertIn(b'tabset-macro', rv.data)
+        self.assertIn(b'tab-content', rv.data)
         rv = self.app.test_client().get('minimal_tabs_macro')
         self.assertIn(b'tabset', rv.data)
         self.assertIn(b'minimal', rv.data)

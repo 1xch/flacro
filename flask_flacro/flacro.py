@@ -5,15 +5,16 @@ from .compat import with_metaclass
 from collections import defaultdict
 import weakref
 
-_macro4_jinja = LocalProxy(lambda: current_app.jinja_env)
+
+_flacro_jinja = LocalProxy(lambda: current_app.jinja_env)
 _glo = LocalProxy(lambda:  current_app.jinja_env.globals)
 
 ATTR_BLACKLIST = re.compile("mwhere|mname|mattr|macros|^_")
 
 
-class MacroForMeta(type):
+class FlacroForMeta(type):
     def __new__(cls, name, bases, dct):
-        new_class = super(MacroForMeta, cls).__new__(cls, name, bases, dct)
+        new_class = super(FlacroForMeta, cls).__new__(cls, name, bases, dct)
         if not hasattr(cls, '_instances'):
             new_class._instances = defaultdict(weakref.WeakSet)
         if not hasattr(cls, '_manager'):
@@ -26,17 +27,17 @@ class MacroForMeta(type):
             cls._registry = {}
         else:
             cls._registry[name] = cls._instances
-        super(MacroForMeta, cls).__init__(name, bases, dct)
+        super(FlacroForMeta, cls).__init__(name, bases, dct)
 
 
-class MacroFor(with_metaclass(MacroForMeta)):
+class FlacroFor(with_metaclass(FlacroForMeta)):
     """
     A container class for managing, holding and returning Jinja2 macros within
     a Flask application. Instance as-is or use as a mixin.
 
-    m = MacroFor(mwhere="macros/my_macro.html", mname="my_macro")
+    m = FlacroFor(mwhere="macros/my_macro.html", mname="my_macro")
 
-    class MyMacro(MacroFor):
+    class MyMacro(FlacroFor):
         def __init__(self, a, b):
             self.a = a
             self.b = b
@@ -46,16 +47,14 @@ class MacroFor(with_metaclass(MacroForMeta)):
     where "macros/my_macro.html" is a file in your templates directory and
     "my_macro" is a defined macro within that file.
 
-    Takes four keyword arguments.
-
-        :param mwhere: the jinja template file location of your macro
-        :param mname:  the name of the macro within the macro file
-        :param mattr:  a dict of items you might want to access
-                       e.g. {'a': 'AAAAAA', 'b': 'BBBBB'}
-        :param macros: a dict of macros within the same file specified
-                       above as mwhere in the form {mname: mattr}
-                       e.g. {'my_macro_1': {1: 'x', 2: 'y'},
-                             'my_macro_2': None}
+    :param mwhere:  the jinja template file location of your macro
+    :param mname:   the name of the macro within the macro file
+    :param mattr:   a dict of items you might want to access
+                    e.g. {'a': 'AAAAAA', 'b': 'BBBBB'}
+    :param macros:  a dict of macros within the same file specified
+                    above as mwhere in the form {mname: mattr}
+                    e.g. {'my_macro_1': {1: 'x', 2: 'y'},
+                            'my_macro_2': None}
     """
     def __init__(self, **kwargs):
         self.tag = kwargs.get('tag', None)
@@ -99,12 +98,12 @@ class MacroFor(with_metaclass(MacroForMeta)):
         the template location of this instance"""
         if replicate:
             mattr=self.public
-        return MacroFor(mwhere=self.mwhere,
+        return FlacroFor(mwhere=self.mwhere,
                         mname=mname,
                         mattr=mattr)
 
     def jinja_template(self, mwhere):
-        return _macro4_jinja.get_template(mwhere, globals=_glo).module
+        return _flacro_jinja.get_template(mwhere, globals=_glo).module
 
     def get_template_attribute(self, mwhere, mname):
         return getattr(self.jinja_template(mwhere), mname)
@@ -135,17 +134,15 @@ class MacroFor(with_metaclass(MacroForMeta)):
         return "<MacroFor {} ({}: {})>".format(getattr(self, 'tag', None), self.mwhere, self.mname)
 
 
-class Macro4(object):
-    """
-    flask/jinja2 tools for managing template macros
-    """
+class Flacro(object):
+    """flask/jinja2 tools for managing template macros"""
     def __init__(self,
                  app=None,
                  register_blueprint=True):
         self.app = app
         self.register_blueprint = register_blueprint
-        self._registry = MacroFor._registry
-        self._managed = MacroFor._manager
+        self._registry = FlacroFor._registry
+        self._managed = FlacroFor._manager
         if self.app is not None:
             self.init_app(self.app)
 
@@ -155,7 +152,7 @@ class Macro4(object):
             for k,v in self._managed.items()])
 
     def init_app(self, app):
-        app.extensions['macro4'] = self
+        app.extensions['flacro'] = self
         app.before_request(self.make_ctx_prc)
         if self.register_blueprint:
             app.register_blueprint(self._blueprint)
@@ -167,4 +164,4 @@ class Macro4(object):
 
     @property
     def _blueprint(self):
-        return Blueprint('macro4', __name__, template_folder='templates')
+        return Blueprint('flacro', __name__, template_folder='templates')

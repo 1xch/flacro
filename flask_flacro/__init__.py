@@ -1,8 +1,8 @@
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
-__all__ = ('Macro4', 'MacroFor', 'AccordianItem', 'AccordianGroupMacro',
+__all__ = ('Flacro', 'FlacroFor', 'AccordianItem', 'AccordianGroupMacro',
     'TabItem', 'TabGroupMacro', 'ListMacro', 'LiItem')
 
-from .macro4 import (Macro4, MacroFor)
+from .flacro import (Flacro, FlacroFor)
 from .packaged_macros import (AccordianItem, AccordianGroupMacro,
     TabItem, TabGroupMacro, ListMacro, LiItem)

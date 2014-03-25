@@ -1,19 +1,20 @@
 from collections import OrderedDict
 from unittest import TestCase
 from flask import Flask, render_template, current_app
-from flask_macro4 import *
+from flask_flacro import *
 
-class Macro4Test(TestCase):
+
+class FlacroTest(TestCase):
     def setUp(self):
         app = Flask(__name__)
         app.config['TESTING'] = True
-        Macro4(app)
+        Flacro(app)
         self.app = app
-        static_macro = MacroFor(tag='static_macro', mwhere='test_macros/test.html', mname='test_macro_static')
-        content_macro = MacroFor(tag='content_macro', mwhere='test_macros/test.html',mname='test_macro_with_content')
-        named_macro = MacroFor(tag='named_macro', mwhere='test_macros/test.html',mname='test_named_macro')
+        static_macro = FlacroFor(tag='static_macro', mwhere='test_macros/test.html', mname='test_macro_static')
+        content_macro = FlacroFor(tag='content_macro', mwhere='test_macros/test.html',mname='test_macro_with_content')
+        named_macro = FlacroFor(tag='named_macro', mwhere='test_macros/test.html',mname='test_named_macro')
 
-        class TestSubclass(MacroFor):
+        class TestSubclass(FlacroFor):
             def __init__(self, anything, **kwargs):
                 self.anything=anything
                 super(TestSubclass, self).__init__(tag=kwargs.get('tag', None),
@@ -26,16 +27,16 @@ class Macro4Test(TestCase):
         #accordian macro
         ai = []
         for i in range(5):
-            ai.append(AccordianItem("accordian{}".format(i), MacroFor(tag="inner_{}".format(i), mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'})))
+            ai.append(AccordianItem("accordian{}".format(i), FlacroFor(tag="inner_{}".format(i), mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'})))
         accordian_macro = AccordianGroupMacro("tag_for_accordian_macro", "accordian_test", ai)
 
         #tab group macro
         ti = OrderedDict()
         tie = TabItem('e', 'E', external="http://somewhere.com")
-        tis = TabItem('s', 'S', static=MacroFor(mwhere='test_macros/test.html', mname='test_macro_static'))
-        tii = TabItem('i', 'I', independent=MacroFor(mwhere='test_macros/test.html', mname='test_macro_independent', mattr={'iam': 'independent'}))
-        tic = TabItem('c', 'C', content=MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'}))
-        tim = TabItem('m', 'M', minimal=MacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'minimal'}))
+        tis = TabItem('s', 'S', static=FlacroFor(mwhere='test_macros/test.html', mname='test_macro_static'))
+        tii = TabItem('i', 'I', independent=FlacroFor(mwhere='test_macros/test.html', mname='test_macro_independent', mattr={'iam': 'independent'}))
+        tic = TabItem('c', 'C', content=FlacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'}))
+        tim = TabItem('m', 'M', minimal=FlacroFor(mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'minimal'}))
         tabitems = [tie, tis, tii, tic]
         [ti.update({k.label: k}) for k in tabitems]
         ti2 = ti

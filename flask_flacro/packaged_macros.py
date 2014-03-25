@@ -1,9 +1,9 @@
 from functools import partial
-from .macro4 import MacroFor
+from .flacro import FlacroFor
 from flask import url_for
 
 
-class LiItem(MacroFor):
+class LiItem(FlacroFor):
     """A list item containing a link. Any kwargs left over will be passed to
     url creation
 
@@ -34,7 +34,7 @@ class LiItem(MacroFor):
             return url_for(route, **route_add)
 
 
-class ListMacro(MacroFor):
+class ListMacro(FlacroFor):
     """A generalized list (links, macros, or anything)
 
     :param list_tag:    a tag for the lsit
@@ -72,7 +72,7 @@ class AccordianItem(object):
             return self.group_label
 
 
-class AccordianGroupMacro(MacroFor):
+class AccordianGroupMacro(FlacroFor):
     def __init__(self,
                  tag,
                  accordian_label,
@@ -110,11 +110,11 @@ class TabItem(object):
 
     def make_li(self, tab_type):
         tab = "{}_li".format(tab_type)
-        return MacroFor(mwhere="macros/tab.html",
+        return FlacroFor(mwhere="macros/tab.html",
                         mname=tab).renderable
 
 
-class TabGroupMacro(MacroFor):
+class TabGroupMacro(FlacroFor):
     def __init__(self, **kwargs):
         self.tag = kwargs.get('tag', None)
         self.minimal = kwargs.get('minimal', False)

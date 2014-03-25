@@ -8,26 +8,29 @@ from flask_macro4 import *
 from tests import *
 import pprint
 
-class Macro4TestCase(Macro4Test):
-    def test_macrofor_static(self):
+
+class FlacroBaseCase(FlacroTest):
+    def test_bases(self): pass
+
+    def test_macro_static(self):
         rv = self.app.test_client().get('/static_macro')
         self.assertIn(b'STATIC MACRO', rv.data)
 
-    def test_macrofor_content(self):
+    def test_macro_content(self):
         rv = self.app.test_client().get('/content_macro')
         self.assertIn(b'THING', rv.data)
 
-    def test_macrofor_attr(self):
+    def test_macro_attr(self):
         rv = self.app.test_client().get('/attr_macro')
         self.assertIn(b'abc', rv.data)
 
-    def test_macrofor_named(self):
+    def test_macro_named(self):
         rv = self.app.test_client().get('/named_macro')
         self.assertIn(b'A NAMED MACRO RENDERED BY NAME', rv.data)
         self.assertIn(b'123', rv.data)
 
 
-class PackagedMacrosTestCase(Macro4Test):
+class PackagedMacrosTestCase(FlacroTest):
     def test_list(self):
         rv = self.app.test_client().get('/links_list')
         self.assertIn(b'l1', rv.data)

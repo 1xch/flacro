@@ -7,15 +7,15 @@ pre-built macros
 from setuptools import setup
 
 setup(
-    name='Flask-Macro4',
-    version='0.0.7',
-    url='https://github.com/thrisp/flask_macro4',
+    name='Flask-Flacro',
+    version='0.0.8',
+    url='https://github.com/thrisp/flacro',
     license='MIT',
     author='hurrata/thrisp',
     author_email='blueblank@gmail.com',
     description='flask/jinja2 templating tools',
     long_description=__doc__,
-    packages=['flask_macro4'],
+    packages=['flask_flacro'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',

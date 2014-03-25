@@ -13,10 +13,10 @@
 
 import sys, os
 
-project_name = u'Flask-Macro4'
+project_name = u'Flask-Flacro'
 project_org = u'Thrisp/Hurrata'
 project_publisher = project_org
-project_copyright = u'2013, {}'.format(project_org)
+project_copyright = u'2014, {}'.format(project_org)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

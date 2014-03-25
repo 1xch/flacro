@@ -3,10 +3,8 @@ from __future__ import with_statement
 import sys
 import os
 from flask import Flask, render_template, current_app
-from flask_macro4 import *
 
 from tests import *
-import pprint
 
 
 class FlacroBaseCase(FlacroTest):

@@ -1,7 +1,19 @@
-Flask-Macro4 Changelog
+Flask-Flacro Changelog
 =======================
 
-Here you can see the full list of changes between each Flask-Macro4 release.
+Here you can see the full list of changes between each Flask-Flacro release.
+
+Version 0.0.8
+-------------
+
+Released March 25th 2014
+
+- package name change
+- refactor minimal/bootstrap tabs to be compatible with both bootstrap & angularjs
+  implementations of tabs, or minimal tabs for otherwise use
+- travis.yml added for continuous integration
+- updated README with some useful badges
+
 
 Version 0.0.7
 -------------

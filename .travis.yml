@@ -1,0 +1,18 @@
+language: python
+
+python:
+    - "2.7"
+    - "3.3"
+    #- "3.4"
+    - "pypy"
+
+install:
+    - pip install . --quiet
+    - "if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install importlib --quiet --use-mirrors; fi"
+    - pip install nose flask coverage --quiet
+
+script: nosetests --with-coverage --cover-package flask_flacro
+
+branches:
+    only:
+        - develop

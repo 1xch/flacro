@@ -1,8 +1,8 @@
 <h1>TEST PAGE</h1>
 {% if rstat %}{{ rstat.render_static }}{% endif %}
 {% if rcont %}{{ rcont.render_with(content) }}{% endif %}
-{% if rattr %}{{ rattr.render }}{% endif %}
-{% if m %}{{ m.render }}{% endif %}
+{% if rattr %}{{ rattr }}{% endif %}
+{% if m %}{{ m }}{% endif %}
 {% if test_named %}
     {{named_macro}}
     {{ATTR_MACRO_2}}

@@ -70,6 +70,9 @@ class FlacroFor(with_metaclass(FlacroForMeta)):
                 setattr(self, k, self.get_macro(k, mattr=v))
         self.register_instance(self)
 
+    def __html__(self):
+        return self.render
+
     @classmethod
     def register_instance(cls, instance):
         if getattr(instance, 'tag', None):

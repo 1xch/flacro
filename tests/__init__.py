@@ -11,26 +11,27 @@ class FlacroTest(TestCase):
         Flacro(app)
         self.app = app
         static_macro = FlacroFor(tag='static_macro', mwhere='test_macros/test.html', mname='test_macro_static')
-        content_macro = FlacroFor(tag='content_macro', mwhere='test_macros/test.html',mname='test_macro_with_content')
-        named_macro = FlacroFor(tag='named_macro', mwhere='test_macros/test.html',mname='test_named_macro')
+        content_macro = FlacroFor(tag='content_macro', mwhere='test_macros/test.html', mname='test_macro_with_content')
+        named_macro = FlacroFor(tag='named_macro', mwhere='test_macros/test.html', mname='test_named_macro')
 
         class TestSubclass(FlacroFor):
             def __init__(self, anything, **kwargs):
-                self.anything=anything
+                self.anything = anything
                 super(TestSubclass, self).__init__(tag=kwargs.get('tag', None),
                                                    mwhere='test_macros/test.html',
                                                    mname='test_macro_with_attr')
 
-        attr_macro  = TestSubclass("abc", tag="ATTR_MACRO_1")
-        attr_macro_alternate  = TestSubclass("123", tag="ATTR_MACRO_2")
+        attr_macro = TestSubclass("abc", tag="ATTR_MACRO_1")
+        attr_macro_alternate = TestSubclass("123", tag="ATTR_MACRO_2")
 
-        #accordian macro
+        # accordion macro
         ai = []
         for i in range(5):
-            ai.append(AccordianItem("accordian{}".format(i), FlacroFor(tag="inner_{}".format(i), mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'})))
-        accordian_macro = AccordianGroupMacro("tag_for_accordian_macro", "accordian_test", ai)
+            ai.append(AccordionItem("accordion{}".format(i), FlacroFor(tag="inner_{}".format(i), mwhere='test_macros/test.html', mname='test_macro_tab_content', mattr={'iam': 'content'})))
+        accordion_macro = AccordionGroupMacro(ai, kind='bootstrap')
+        minimal_accordion_macro = AccordionGroupMacro(ai)
 
-        #tab group macro
+        # tab group macro
         ti = OrderedDict()
         tie = TabItem('e', 'E', external="http://somewhere.com")
         tis = TabItem('s', 'S', static=FlacroFor(mwhere='test_macros/test.html', mname='test_macro_static'))
@@ -41,16 +42,11 @@ class FlacroTest(TestCase):
         [ti.update({k.label: k}) for k in tabitems]
         ti2 = ti
         ti2['m'] = tim
-        tabs_macro = TabGroupMacro(minimal=False,
-                                   tag="tag_for_tab_macro",
-                                   tabs_label="test_tabs",
-                                   tab_groups=ti)
-        minimal_tabs_macro = TabGroupMacro(minimal=True,
-                                           tag="tag_for_minimal_tabs",
-                                           tabs_label="minimal_test_tabs",
-                                           tab_groups=ti2)
+        tabs_macro = TabGroupMacro(ti, kind='bootstrap')
+        minimal_tabs_macro = TabGroupMacro(ti2)
 
-        packaged_macros = {'accordian_macro': accordian_macro,
+        packaged_macros = {'accordion_macro': accordion_macro,
+                           'minimal_accordion_macro': minimal_accordion_macro,
                            'tabs_macro': tabs_macro,
                            'minimal_tabs_macro': minimal_tabs_macro}
 
@@ -82,7 +78,7 @@ class FlacroTest(TestCase):
         def test_page_two():
             return "TWO"
 
-        #list/listitems macro
+        # list/listitems macro
         l1 = LiItem('l1', kind='link', for_url='test_page_one')
         l2 = LiItem('l2', kind='link', for_url='test_page_two', arbitrary='for_attr_macro_route')
         l3 = LiItem('a plain item')

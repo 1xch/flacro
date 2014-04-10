@@ -1,5 +1,5 @@
 {% macro minimal_li(v) %}
-    {{ v.minimal.render }}
+    {{ v.minimal }}
 {% endmacro %}
 
 {% macro external_li(v) %}
@@ -11,7 +11,7 @@
 {% endmacro %}
 
 {% macro independent_li(v) %}
-    <li class="{{ v.label }}">{{ v.independent.render }}</li>
+    <li class="{{ v.label }}">{{ v.independent }}</li>
 {% endmacro %}
 
 {% macro content_li(v) %}
@@ -34,28 +34,28 @@
 
 {% macro _tab_content(content) %}
     <div id="{{ content['label'] }}" class="tab-pane">
-        {{ content.content.render | safe }} 
+        {{ content.content | safe }} 
     </div>
 {% endmacro %}
 
 {% macro bootstrap_tabs(t) %}
-    <div class={{ t.tabset_css_class }}>
+    <div class={{ t.css_class }}>
         <ul class="nav {% if t.pills %} nav-pills{% else %} nav-tabs{% endif %}{% if t.justified %} nav-justified{% endif %}{% if t.vertical %} nav-stacked{% endif %}">
-            {{ _tabs_navigation(t.tab_groups) }}
+            {{ _tabs_navigation(t.tabs) }}
         </ul>
         <div class="tab-content">
-            {{ _tabs_content(t.tab_groups)}}
+            {{ _tabs_content(t.tabs)}}
         </div>
     </div>
 {% endmacro %}
 
 {% macro minimal_tabs(t) %}
-    <tabset class={{ t.tabset_css_class }}{%if t.vertical%} vertical="true"{% endif %}{% if t.justified %} justified="true"{% endif %}>
-        {% for k,v in t.tab_groups.items() %}
+    <tabset class={{ t.css_class }}{% if t.pills %} type="pills"{% endif %} vertical={{ t.vertical|lower|string }} justified={{ t.justified|lower|string }}>
+        {% for k, v in t.tabs.items() %}
             {% if v.kind in ('minimal', 'external', 'static', 'independent') %}
-                {{ v._li(v) | safe}}
+                {{ v._li(v) | safe }}
             {% else %}
-                <tab heading={{v['label']}}>{{ v.content.render | safe }}</tab>
+                <tab heading={{v.label}}>{{ v.content | safe }}</tab>
             {% endif %}
         {% endfor %}
     </tabset>

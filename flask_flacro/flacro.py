@@ -31,8 +31,7 @@ class FlacroForMeta(type):
 
 
 class FlacroFor(with_metaclass(FlacroForMeta)):
-    """
-    A container class for managing, holding and returning Jinja2 macros within
+    """A container class for managing, holding and returning Jinja2 macros within
     a Flask application. Instance as-is or use as a mixin.
 
     m = FlacroFor(mwhere="macros/my_macro.html", mname="my_macro")

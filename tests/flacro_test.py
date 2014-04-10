@@ -1,14 +1,11 @@
 from __future__ import with_statement
 
-import sys
-import os
-from flask import Flask, render_template, current_app
-
-from tests import *
+from tests import FlacroTest
 
 
 class FlacroBaseCase(FlacroTest):
-    def test_bases(self): pass
+    def test_bases(self):
+        pass
 
     def test_macro_static(self):
         rv = self.app.test_client().get('/static_macro')
@@ -36,19 +33,17 @@ class PackagedMacrosTestCase(FlacroTest):
         self.assertIn(b'arbitrary=for_attr_macro_route', rv.data)
         self.assertIn(b'a plain item', rv.data)
 
-    def test_accordian(self):
-        rv = self.app.test_client().get('/accordian_macro')
-        self.assertIn(b'accordian_test-accordion', rv.data)
-        self.assertIn(b'#accordian_test', rv.data)
+    def test_accordion(self):
+        rv = self.app.test_client().get('/accordion_macro')
+        self.assertIn(b'class="accordion accordionset-macro"', rv.data)
+        self.assertIn(b'data-parent="#accordionset"', rv.data)
+        rv = self.app.test_client().get('/minimal_accordion_macro')
+        self.assertIn(b'heading=accordion4', rv.data)
 
     def test_tabs(self):
         rv = self.app.test_client().get('/tabs_macro')
         self.assertIn(b'tabset-macro', rv.data)
         self.assertIn(b'tab-content', rv.data)
-        rv = self.app.test_client().get('minimal_tabs_macro')
+        rv = self.app.test_client().get('/minimal_tabs_macro')
         self.assertIn(b'tabset', rv.data)
         self.assertIn(b'minimal', rv.data)
-
-
-if __name__ == '__main__':
-    unittest.main()

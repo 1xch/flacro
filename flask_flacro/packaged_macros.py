@@ -52,7 +52,7 @@ class ListMacro(FlacroFor):
         super(ListMacro, self).__init__(mname='listmacro', mwhere="macros/list.html")
 
 
-class AccordianItem(object):
+class AccordionItem(object):
     def __init__(self,
                  group_label,
                  interior,
@@ -61,7 +61,7 @@ class AccordianItem(object):
         self.group_label = group_label
         self.interior = interior
         self.is_open = is_open
-        self.of_accordian = None
+        self.of_accordion = None
         self.display_label = display_label
 
     @property
@@ -72,21 +72,22 @@ class AccordianItem(object):
             return self.group_label
 
 
-class AccordianGroupMacro(FlacroFor):
-    def __init__(self,
-                 tag,
-                 accordian_label,
-                 accordian_groups,
-                 group_class="accordian-macro"):
-        self.accordian_groups = accordian_groups
-        self.accordian_label = accordian_label
-        for g in accordian_groups:
-            g.of_accordian = accordian_label
-        self.accordian_groups = accordian_groups
-        self.group_class = group_class
-        super(AccordianGroupMacro, self).__init__(tag=tag,
-                                                  mwhere="macros/accordian.html",
-                                                  mname="accordian_group_macro")
+class AccordionGroupMacro(FlacroFor):
+    def __init__(self, accordions, tag='accordionset', **kwargs):
+        self.accordions = accordions
+        self.tag = tag
+        self.kind = get_kind(kwargs.get('kind', None))
+        self.mname = "{}_accordion".format(self.kind)
+        self.mwhere = kwargs.get('mwhere', "macros/accordion.html")
+        self.css_class = "{}-macro".format(self.tag)
+        for opt in ('close_others'):
+            setattr(self, opt, kwargs.get(opt, False))
+        if self.accordions and self.kind == 'bootstrap':
+            [setattr(g, 'of_accordion', self.tag)
+             for g in self.accordions]
+        super(AccordionGroupMacro, self).__init__(tag=self.tag,
+                                                  mname=self.mname,
+                                                  mwhere=self.mwhere)
 
 
 class TabItem(object):
@@ -97,7 +98,7 @@ class TabItem(object):
 
     def set_tab(self, kwargs):
         if kwargs:
-            for k,v in kwargs.items():
+            for k, v in kwargs.items():
                 if k in ('minimal', 'external', 'static', 'independent', 'content'):
                     tab_type = k
                     tab_content = v
@@ -111,33 +112,26 @@ class TabItem(object):
     def make_li(self, tab_type):
         tab = "{}_li".format(tab_type)
         return FlacroFor(mwhere="macros/tab.html",
-                        mname=tab).renderable
+                         mname=tab).renderable
 
 
 class TabGroupMacro(FlacroFor):
-    def __init__(self, **kwargs):
-        self.tag = kwargs.get('tag', None)
-        self.minimal = kwargs.get('minimal', False)
-        if self.minimal:
-            self.mname = "minimal_tabs"
-        else:
-            self.mname = "bootstrap_tabs"
+    def __init__(self, tabs, tag='tabset', **kwargs):
+        self.tabs = tabs
+        self.tag = tag
+        self.kind = get_kind(kwargs.get('kind', None))
+        self.mname = "{}_tabs".format(self.kind)
         self.mwhere = kwargs.get('mwhere', "macros/tab.html")
-        self.tabs_label = kwargs.get('tabs_label', None)
-        self.tab_groups = kwargs.get('tab_groups', None)
-        self.tabset_css_class = kwargs.get('tabset_css_class', "tabset-macro")
-        self.vertical = kwargs.get('vertical', False)
-        self.justified = kwargs.get('justified', False)
-        self.pills =  kwargs.get('pills', False)
+        self.css_class = "{}-macro".format(self.tag)
+        for opt in ('vertical', 'justified', 'pills'):
+            setattr(self, opt, kwargs.get(opt, False))
         super(TabGroupMacro, self).__init__(tag=self.tag,
                                             mname=self.mname,
-                                            mwhere=self.mwhere,
-                                            mattr={'tabs_label': self.tabs_label,
-                                                   'tab_groups': self.tab_groups,
-                                                   'tabs_css_class': self.tabset_css_class,
-                                                   'tabs_nav_class': "tabbed-nav-{}".format(self.tabset_css_class),
-                                                   'tabs_content_class': "content-for-tabs-{}".format(self.tabset_css_class),
-                                                   'vertical': self.vertical,
-                                                   'justified': self.justified,
-                                                   'pills': self.pills,
-                                                   })
+                                            mwhere=self.mwhere)
+
+
+def get_kind(kind):
+    if kind in ('minimal', 'bootstrap'):
+        return kind
+    else:
+        return 'minimal'

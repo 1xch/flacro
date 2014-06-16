@@ -56,7 +56,7 @@ class AccordionItem(object):
     def __init__(self,
                  group_label,
                  interior,
-                 is_open=True,
+                 is_open=False,
                  display_label=None):
         self.group_label = group_label
         self.interior = interior
@@ -79,7 +79,7 @@ class AccordionGroupMacro(FlacroFor):
         self.kind = get_kind(kwargs.get('kind', None))
         self.mname = "{}_accordion".format(self.kind)
         self.mwhere = kwargs.get('mwhere', "macros/accordion.html")
-        self.css_class = "{}-macro".format(self.tag)
+        self.css_class = self.tag
         for opt in ('close_others'):
             setattr(self, opt, kwargs.get(opt, False))
         if self.accordions and self.kind == 'bootstrap':
@@ -122,7 +122,7 @@ class TabGroupMacro(FlacroFor):
         self.kind = get_kind(kwargs.get('kind', None))
         self.mname = "{}_tabs".format(self.kind)
         self.mwhere = kwargs.get('mwhere', "macros/tab.html")
-        self.css_class = "{}-macro".format(self.tag)
+        self.css_class = self.tag
         for opt in ('vertical', 'justified', 'pills'):
             setattr(self, opt, kwargs.get(opt, False))
         super(TabGroupMacro, self).__init__(tag=self.tag,

@@ -3,7 +3,7 @@
 {% endmacro %}
 
 {% macro external_li(v) %}
-    <li><a href="{{ v.external }}">{{ v.tab_label | capitalize }}</a></li>
+    <li><a href="{{ v.external }}">{{ v.tab_label|safe}}</a></li>
 {% endmacro %}
 
 {% macro static_li(v) %}
@@ -39,7 +39,7 @@
 {% endmacro %}
 
 {% macro bootstrap_tabs(t) %}
-    <div class={{ t.css_class }}>
+    <div class="{{ t.css_class }}">
         <ul class="nav {% if t.pills %} nav-pills{% else %} nav-tabs{% endif %}{% if t.justified %} nav-justified{% endif %}{% if t.vertical %} nav-stacked{% endif %}">
             {{ _tabs_navigation(t.tabs) }}
         </ul>

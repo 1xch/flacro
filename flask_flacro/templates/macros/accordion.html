@@ -1,13 +1,13 @@
 {% macro minimal_accordion(accordion) %}
-    <accordion close-others={{ accordion.close_others | lower | string }}>
+    <accordion {% if accordion.close_others %}close-others="true"{% else %}close-others="false"{% endif %}>
         {% for a in accordion.accordions %}
-            <accordion-group heading={{a.group_label}} {% if a.is_open %}is-open="true"{% endif %}>{{a.interior}}</accordion-group>
+            <accordion-group heading={{a.group_label}} {% if a.is_open %}is-open='true'{% endif %}>{{a.interior}}</accordion-group>
         {% endfor %}
     </accordion>
 {% endmacro %}
 
 {% macro bootstrap_accordion(accordion) %}
-    <div class="accordion {{accordion.css_class}}"">
+    <div class="accordion {{accordion.css_class}}">
         {%  for g in accordion.accordions %}
             <div class="accordion-group {{ accordion.css_class }}">
                 <div class="accordion-heading">
